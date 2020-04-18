@@ -60,7 +60,7 @@ export default function Employees() {
         if(!authLevel) return setError('Please input employees authority level')
         
         dispatch(createEmployee({
-            name, email, password, birthDate, address, phoneNumber, superior, role, authLevel, paidLeave
+            name, email, password, birthDate, address, phoneNumber, superior, role, authLevel, paidLeave, image_url: photo
         }))
         setModal(!modal)
         resetForm()
@@ -79,7 +79,7 @@ export default function Employees() {
             data: newForm
         })
             .then(({data}) => {
-                console.log(data)
+                setPhoto(data.fileName.location)
             })
     }
 
@@ -159,9 +159,6 @@ export default function Employees() {
                     />
                     <Form.Input 
                         type="file"
-                        label="Photo" 
-                        placeholder='Photo'
-                        value={photo}
                         onChange={(event) => handleImage(event)}
                     />
                     <Button primary onClick={(event) => handleSubmitForm(event)} content="Submit" />
@@ -171,9 +168,8 @@ export default function Employees() {
             <h1>Ini Employees</h1>
             <h3>Total Employees: { employees.length } </h3>
             <Button onClick={() => setModal(!modal)} content="Add Employee" />
-            <img src="https://drive.google.com/file/d/1kaW4lAGSRs3EjqPL9u_G3mRSw20je8y_/preview"/>
             {/* Table */}
-            <Table sortable celled fixed>
+            <Table sortable celled unstackable>
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell>Photo</Table.HeaderCell>

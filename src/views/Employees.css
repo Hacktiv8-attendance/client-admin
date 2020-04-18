@@ -14,3 +14,7 @@
     margin-bottom: 15px;
     font-size: small;
 }
+
+.employee-photo{
+    object-fit: cover;
+}

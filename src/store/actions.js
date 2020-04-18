@@ -104,7 +104,7 @@ export const updateEmployee = (payload) => {
         axios({
             method: 'put',
             url: `http://localhost:3000/admin/employee/${payload.id}`,
-            data: payload.data,
+            data: payload,
             headers: {
                 token : localStorage.token
             }
