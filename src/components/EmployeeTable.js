@@ -5,7 +5,7 @@ import moment from 'moment'
 export default function EmployeeTable({ employee }) {
     return (
         <Table.Row>
-            <Table.Cell> {employee.name} </Table.Cell>
+            <Table.Cell><a href={employee.image_url} target="_blank"><img src={employee.image_url}/></a></Table.Cell>
             <Table.Cell> {employee.id} </Table.Cell>
             <Table.Cell> {employee.name} </Table.Cell>
             <Table.Cell> {employee.email} </Table.Cell>

@@ -5,6 +5,7 @@ import { fetchEmployees, createEmployee } from '../store/actions'
 
 import './Employees.css'
 import EmployeeTable from '../components/EmployeeTable.js'
+import Axios from 'axios'
 
 export default function Employees() {
     const dispatch = useDispatch()
@@ -27,7 +28,7 @@ export default function Employees() {
     const [role, setRole] = useState('')
     const [superior, setSuperior] = useState(null)
     const [authLevel, setAuthLevel] = useState(null)
-    const [photo, setPhoto] = useState('')
+    const [photo, setPhoto] = useState("")
     const [paidLeave, setPaidLeave] = useState(12)
 
     const resetForm = () => {
@@ -63,6 +64,23 @@ export default function Employees() {
         }))
         setModal(!modal)
         resetForm()
+    }
+
+    const handleImage = (event) => {
+        event.preventDefault()
+        const newForm = new FormData();
+        newForm.append('image', event.target.files[0])
+        Axios({
+            method: "POST",
+            url: "http://localhost:3000/admin/upload",
+            headers: {
+                token: localStorage.token
+            },
+            data: newForm
+        })
+            .then(({data}) => {
+                console.log(data)
+            })
     }
 
     useEffect(() => {
@@ -144,7 +162,7 @@ export default function Employees() {
                         label="Photo" 
                         placeholder='Photo'
                         value={photo}
-                        onChange={(event) => setPhoto(event.target.value)}
+                        onChange={(event) => handleImage(event)}
                     />
                     <Button primary onClick={(event) => handleSubmitForm(event)} content="Submit" />
                 </Form>
@@ -153,7 +171,7 @@ export default function Employees() {
             <h1>Ini Employees</h1>
             <h3>Total Employees: { employees.length } </h3>
             <Button onClick={() => setModal(!modal)} content="Add Employee" />
-
+            <img src="https://drive.google.com/file/d/1kaW4lAGSRs3EjqPL9u_G3mRSw20je8y_/preview"/>
             {/* Table */}
             <Table sortable celled fixed>
                 <Table.Header>
