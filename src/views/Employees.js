@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Form, Table } from 'semantic-ui-react'
+import { Modal, Button, Form, Table, Dimmer, Loader } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux' 
 import { fetchEmployees, createEmployee } from '../store/actions'
 
@@ -26,8 +26,8 @@ export default function Employees() {
     const [address, setAddress] = useState('')
     const [phoneNumber, setPhoneNumber] = useState('')
     const [role, setRole] = useState('')
-    const [superior, setSuperior] = useState(null)
-    const [authLevel, setAuthLevel] = useState(null)
+    const [superior, setSuperior] = useState(0)
+    const [authLevel, setAuthLevel] = useState(0)
     const [photo, setPhoto] = useState("")
     const [paidLeave, setPaidLeave] = useState(12)
 
@@ -88,7 +88,6 @@ export default function Employees() {
             dispatch(fetchEmployees())
         }
     }, [dispatch, employees.length])
-
     return (
         <div id="employees-page">
             <Modal closeIcon onClose={() => setModal(!modal)} dimmer={'blurring'} open={modal} >
@@ -169,28 +168,31 @@ export default function Employees() {
             <h3>Total Employees: { employees.length } </h3>
             <Button onClick={() => setModal(!modal)} content="Add Employee" />
             {/* Table */}
-            <Table sortable celled unstackable>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>Photo</Table.HeaderCell>
-                        <Table.HeaderCell>ID</Table.HeaderCell>
-                        <Table.HeaderCell >Full Name</Table.HeaderCell>
-                        <Table.HeaderCell>Email</Table.HeaderCell>
-                        <Table.HeaderCell>Role</Table.HeaderCell>
-                        <Table.HeaderCell>Superior</Table.HeaderCell>
-                        <Table.HeaderCell>Level</Table.HeaderCell>
-                        <Table.HeaderCell>Birth Date</Table.HeaderCell>
-                        <Table.HeaderCell>Address</Table.HeaderCell>
-                        <Table.HeaderCell>Phone Number</Table.HeaderCell>
-                        <Table.HeaderCell>Annual leave remaining</Table.HeaderCell>
-                        <Table.HeaderCell>Actions</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
+            {loading ? <Dimmer active inverted><Loader inverted>Loading</Loader></Dimmer> : 
+                <Table sortable celled unstackable>
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell>Photo</Table.HeaderCell>
+                            <Table.HeaderCell>ID</Table.HeaderCell>
+                            <Table.HeaderCell >Full Name</Table.HeaderCell>
+                            <Table.HeaderCell>Email</Table.HeaderCell>
+                            <Table.HeaderCell>Role</Table.HeaderCell>
+                            <Table.HeaderCell>Superior</Table.HeaderCell>
+                            <Table.HeaderCell>Level</Table.HeaderCell>
+                            <Table.HeaderCell>Birth Date</Table.HeaderCell>
+                            <Table.HeaderCell>Address</Table.HeaderCell>
+                            <Table.HeaderCell>Phone Number</Table.HeaderCell>
+                            <Table.HeaderCell>Annual leave remaining</Table.HeaderCell>
+                            <Table.HeaderCell>Actions</Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
 
-                <Table.Body>
-                    { employees.map(employee => <EmployeeTable key={employee.id} employee={employee} />)}
-                </Table.Body>
-            </Table>
+                    <Table.Body>
+                        { employees.map(employee => <EmployeeTable key={employee.id} employee={employee} />)}
+                    </Table.Body>
+                </Table>
+            }
+            
         </div>
     )
 }

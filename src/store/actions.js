@@ -62,7 +62,7 @@ export const createEmployee = (payload) => {
         .then(({ data }) => {
             dispatch({
                 type: "ADD_EMPLOYEE",
-                payload
+                payload: {...payload, id: data.id}
             })
         })
         .catch( err => {
@@ -85,8 +85,8 @@ export const deleteEmployee = (payload) => {
                 token: localStorage.token
             }
         })
-        .then(() => {
-            dispatch(fetchEmployees())
+        .then(({data}) => {
+            dispatch({type: "DELETE_EMPLOYEE", payload: data})
         })
         .catch(() => {
             dispatch(setError('Delete employee failed'))
@@ -110,8 +110,7 @@ export const updateEmployee = (payload) => {
             }
         })
         .then(({ data }) => {
-            console.log(data)
-            dispatch(fetchEmployees())
+            dispatch({ type: "UPDATE_EMPLOYEE", payload: data})
         })
         .catch(err => {
             console.log(err)
