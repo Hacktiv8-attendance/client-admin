@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, Button, Form } from 'semantic-ui-react'
+import { useDispatch, useSelector } from 'react-redux' 
 import axios from 'axios'
 import { NotificationManager } from 'react-notifications'
+import { fetchEmployees } from '../store/actions'
 
 import './Employees.css'
 
