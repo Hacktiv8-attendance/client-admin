@@ -1,0 +1,16 @@
+#employees-page{
+    background-color: whitesmoke;
+}
+
+#employees-add-form{
+    padding: 25px;
+}
+
+#employees-add-error{
+    color: red;
+    font-weight: bold;
+    text-align: center;
+    margin-top:0 ;
+    margin-bottom: 15px;
+    font-size: small;
+}
