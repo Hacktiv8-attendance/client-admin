@@ -1,0 +1,28 @@
+#qr-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 15px;
+    padding: 15px;
+    margin-top: 10vh;
+    width: 50%;
+}
+
+#qr-time{
+    margin: 0;
+    font-weight: bolder;
+    color: #11999e;
+    font-size: 5rem;
+}
+
+#qr-date{
+    font-size: 2rem;
+    color: #11999e;
+    margin-bottom: 0;
+}
+
+#qr-button{
+    background-color: #11999e;
+    color: white;
+}
