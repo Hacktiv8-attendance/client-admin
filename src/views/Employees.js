@@ -1,25 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Form } from 'semantic-ui-react'
+import { Modal, Button, Form, Table } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux' 
-import axios from 'axios'
-import { NotificationManager } from 'react-notifications'
-import { fetchEmployees } from '../store/actions'
+import { fetchEmployees, createEmployee } from '../store/actions'
 
 import './Employees.css'
+import EmployeeTable from '../components/EmployeeTable.js'
 
 export default function Employees() {
     const dispatch = useDispatch()
-    const employees = useSelector(state => state.reducers.employees)
+
+    // Store statement
+    let employees = useSelector(state => state.reducers.employees)
+    const loading = useSelector(state => state.reducers.loading)
     // const error = useSelector(state => state.reducers.error)
-    // const loading = useSelector(state => state.reducers.loading)
-    
-    useEffect(() => {
-        dispatch(fetchEmployees())
-    }, [])
 
     const [modal, setModal] = useState(false)
     const [error, setError] = useState('')
-    const [loading, setLoading] = useState(false)
 
     // State for form
     const [name, setName] = useState('')
@@ -32,6 +28,7 @@ export default function Employees() {
     const [superior, setSuperior] = useState(null)
     const [authLevel, setAuthLevel] = useState(null)
     const [photo, setPhoto] = useState('')
+    const [paidLeave, setPaidLeave] = useState(12)
 
     const resetForm = () => {
         setName('')
@@ -47,7 +44,6 @@ export default function Employees() {
     }
 
     const handleSubmitForm = (event) => {
-        const token = localStorage.getItem('token')
         setError('')
         event.preventDefault()
         
@@ -62,29 +58,18 @@ export default function Employees() {
         if(!superior) return setError('Please input employees superior')
         if(!authLevel) return setError('Please input employees authority level')
         
-        setLoading(true)
-        axios({
-            method: "POST",
-            url: "http://localhost:3000/admin/employee",
-            headers: { token },
-            data: {
-                name, email, password, birthDate, address, role, superior, authLevel
-            }
-        })
-            .then(({ data }) => {
-                console.log(data)
-                NotificationManager.success(`Added ${data.name}`, 'Success!')
-                setModal(!modal)
-                resetForm()
-            })
-            .catch(err => {
-                setError(err.response.data.errors[0])
-            })
-            .finally(() => {
-                setLoading(false)
-            })
+        dispatch(createEmployee({
+            name, email, password, birthDate, address, phoneNumber, superior, role, authLevel, paidLeave
+        }))
+        setModal(!modal)
+        resetForm()
     }
 
+    useEffect(() => {
+        if(employees.length === 0 ) {
+            dispatch(fetchEmployees())
+        }
+    }, [dispatch, employees.length])
 
     return (
         <div id="employees-page">
@@ -149,6 +134,12 @@ export default function Employees() {
                         onChange={(event) => setAuthLevel(event.target.value)}
                     />
                     <Form.Input 
+                        label="Annual Level" 
+                        placeholder='Annual Level'
+                        value={paidLeave}
+                        onChange={(event) => setPaidLeave(event.target.value)}
+                    />
+                    <Form.Input 
                         type="file"
                         label="Photo" 
                         placeholder='Photo'
@@ -160,8 +151,32 @@ export default function Employees() {
             </Modal>
 
             <h1>Ini Employees</h1>
-            <h3>Total Employees: </h3>
+            <h3>Total Employees: { employees.length } </h3>
             <Button onClick={() => setModal(!modal)} content="Add Employee" />
+
+            {/* Table */}
+            <Table sortable celled fixed>
+                <Table.Header>
+                    <Table.Row>
+                        <Table.HeaderCell>Photo</Table.HeaderCell>
+                        <Table.HeaderCell>ID</Table.HeaderCell>
+                        <Table.HeaderCell >Full Name</Table.HeaderCell>
+                        <Table.HeaderCell>Email</Table.HeaderCell>
+                        <Table.HeaderCell>Role</Table.HeaderCell>
+                        <Table.HeaderCell>Superior</Table.HeaderCell>
+                        <Table.HeaderCell>Level</Table.HeaderCell>
+                        <Table.HeaderCell>Birth Date</Table.HeaderCell>
+                        <Table.HeaderCell>Address</Table.HeaderCell>
+                        <Table.HeaderCell>Phone Number</Table.HeaderCell>
+                        <Table.HeaderCell>Annual leave remaining</Table.HeaderCell>
+                        <Table.HeaderCell>Actions</Table.HeaderCell>
+                    </Table.Row>
+                </Table.Header>
+
+                <Table.Body>
+                    { employees.map(employee => <EmployeeTable key={employee.id} employee={employee} />)}
+                </Table.Body>
+            </Table>
         </div>
     )
 }

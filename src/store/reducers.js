@@ -21,6 +21,12 @@ const reducers = (state = initialStatus, action) => {
                 ...state,
                 error : action.payload
             }
+        case "ADD_EMPLOYEE" :
+            console.log(action.payload)
+            return {
+                ...state,
+                employees: [...state.employees, action.payload]
+            }
         default: 
             return state
     }

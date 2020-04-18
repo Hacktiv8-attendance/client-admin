@@ -33,7 +33,6 @@ export const fetchEmployees = (payload) => {
             }
         })
         .then(({ data }) => {
-            console.log('ke hit kesini')
             if(data){
                 dispatch(setEmployees(data))
             } else {
@@ -49,7 +48,7 @@ export const fetchEmployees = (payload) => {
     }
 }
 
-export const createEmployees = (payload) => {
+export const createEmployee = (payload) => {
     return function(dispatch) {
         dispatch(setLoading(true))
         axios({
@@ -61,7 +60,10 @@ export const createEmployees = (payload) => {
             }
         })
         .then(({ data }) => {
-            console.log(data)
+            dispatch({
+                type: "ADD_EMPLOYEE",
+                payload
+            })
         })
         .catch( err => {
             console.log(err)
