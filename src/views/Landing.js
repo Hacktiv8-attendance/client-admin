@@ -34,6 +34,7 @@ export default function Landing() {
             .post(loginUrl, { email, password })
             .then(({ data }) => {
                 localStorage.setItem('token', data.token)
+                localStorage.setItem('email', data.payload.email)
                 history.push('/dashboard')
                 setEmail('')
                 setPassword('')
