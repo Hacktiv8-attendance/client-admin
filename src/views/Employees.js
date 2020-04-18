@@ -5,18 +5,9 @@ import { fetchEmployees } from '../store/actions'
 export default function Employees() {
     const dispatch = useDispatch()
     const employees = useSelector(state => state.reducers.employees)
-    // const [name, setName] = useState('')
-    // const [email, setEmail] = useState('')
-    // const [password, setPassword] = useState('')
-    // const [birthDate, setBirthDate] = useState('')
-    // const [address, setAddress] = useState('')
-    // const [phoneNumber, setPhoneNumber] = useState('')
-    // const [role, setRole] = useState('')
-    // const [authLevel, setAuthLevel] = useState('')
-    // const [superior, setSuperior] = useState('')
-    // const [paidLeave, setPaidLeave] = useState('')
+    const error = useSelector(state => state.reducers.error)
+    const loading = useSelector(state => state.reducers.loading)
     
-
     useEffect(() => {
         dispatch(fetchEmployees())
     }, [])
