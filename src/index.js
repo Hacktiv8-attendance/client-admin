@@ -6,7 +6,6 @@ import { Provider } from 'react-redux'
 import store from './store/store'
 import * as serviceWorker from './serviceWorker';
 import 'semantic-ui-css/semantic.min.css'
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { BrowserRouter } from 'react-router-dom'
 

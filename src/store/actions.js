@@ -21,8 +21,8 @@ export const setEmployees = (value) => {
     }
 }
 
-export const fetchEmployees = (value) => {
-    console.log(localStorage.token)
+
+export const fetchEmployees = (payload) => {
     return function(dispatch) {
         dispatch(setLoading(true))
         axios({
@@ -36,13 +36,84 @@ export const fetchEmployees = (value) => {
             console.log('ke hit kesini')
             if(data){
                 dispatch(setEmployees(data))
-                // console.log(data)
             } else {
                 dispatch(setError('Data employees is not found'))
             }
         })
         .catch(err => {
             dispatch(setError(err))
+        })
+        .finally(() => {
+            dispatch(setLoading(false))
+        })
+    }
+}
+
+export const createEmployees = (payload) => {
+    return function(dispatch) {
+        dispatch(setLoading(true))
+        axios({
+            method: 'post',
+            url: 'http://localhost:3000/admin/employee',
+            data: payload,
+            headers: {
+                token: localStorage.token
+            }
+        })
+        .then(({ data }) => {
+            console.log(data)
+        })
+        .catch( err => {
+            console.log(err)
+            dispatch(setError('Failed create data new employee'))
+        })
+        .finally(() => {
+            dispatch(setLoading(false))
+        })
+    }
+}
+
+export const deleteEmployee = (payload) => {
+    return function(dispatch) {
+        dispatch(setLoading(true))
+        axios({
+            method: 'delete',
+            url: `http://localhost:3000/admin/employee/${payload}`,
+            headers: {
+                token: localStorage.token
+            }
+        })
+        .then(() => {
+            dispatch(fetchEmployees())
+        })
+        .catch(() => {
+            dispatch(setError('Delete employee failed'))
+        })
+        .finally(() => {
+            dispatch(setLoading(false))
+        })
+    }
+}
+
+
+export const updateEmployee = (payload) => {
+    return function(dispatch) {
+        dispatch(setLoading(true))
+        axios({
+            method: 'put',
+            url: `http://localhost:3000/admin/employee/${payload.id}`,
+            data: payload.data,
+            headers: {
+                token : localStorage.token
+            }
+        })
+        .then(({ data }) => {
+            console.log(data)
+            dispatch(fetchEmployees())
+        })
+        .catch(err => {
+            console.log(err)
+            dispatch(setError('Update Employee Failed'))
         })
         .finally(() => {
             dispatch(setLoading(false))

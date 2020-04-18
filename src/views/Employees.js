@@ -1,11 +1,21 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, Button, Form } from 'semantic-ui-react'
+import { useDispatch, useSelector } from 'react-redux' 
 import axios from 'axios'
 import { NotificationManager } from 'react-notifications'
+import { fetchEmployees } from '../store/actions'
 
 import './Employees.css'
 
 export default function Employees() {
+    const dispatch = useDispatch()
+    const employees = useSelector(state => state.reducers.employees)
+    // const error = useSelector(state => state.reducers.error)
+    // const loading = useSelector(state => state.reducers.loading)
+    
+    useEffect(() => {
+        dispatch(fetchEmployees())
+    }, [])
 
     const [modal, setModal] = useState(false)
     const [error, setError] = useState('')
@@ -155,4 +165,5 @@ export default function Employees() {
         </div>
     )
 }
+
 
