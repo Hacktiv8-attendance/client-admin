@@ -19,6 +19,7 @@ export default function QR() {
         else return 'evening'
     }
 
+
     setInterval(() => {
         setClock(moment(new Date()).format("dddd, MMMM Do YYYY, HH:mm:ss"))
     }, 1000)

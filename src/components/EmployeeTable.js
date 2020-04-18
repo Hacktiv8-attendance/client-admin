@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
-import { Table, Image, Modal, Form, Button } from 'semantic-ui-react'
+import { Table, Image, Modal, Form, Button, Icon } from 'semantic-ui-react'
 import moment from 'moment'
 import ImageDefault from '../assets/ImageDefault.png'
 import Axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateEmployee } from '../store/actions'
+import { updateEmployee, deleteEmployee } from '../store/actions'
 
 import '../views/Employees.css'
 
 export default function EmployeeTable({ employee }) {
     const dispatch = useDispatch()
     const loading = useSelector(state => state.reducers.loading)
-
+    const dbPassword = employee.password
     // Edit Form
     const [name, setName] = useState(employee.name)
     const [email, setEmail] = useState(employee.email)
@@ -58,10 +58,12 @@ export default function EmployeeTable({ employee }) {
         if(!role) return setError('Please input employees role')
         if(!superior) return setError('Please input employees superior')
         if(!authLevel) return setError('Please input employees authority level')
-
-        dispatch(updateEmployee({
-            id: employee.id, name, email, password, birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
-        })) 
+        password === dbPassword ? dispatch(updateEmployee({
+            id: employee.id, name, email, birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
+        })) : dispatch(updateEmployee({
+            id: employee.id, name, email, password , birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
+        }))
+         
 
         setModal(!modal)
     }
@@ -70,6 +72,9 @@ export default function EmployeeTable({ employee }) {
         return setBirthDate(date.substr(0, 10))
     }
     
+    const deleteHandle = () => {
+        dispatch(deleteEmployee(employee.id))
+    }
 
     return (
         <Table.Row>
@@ -85,9 +90,18 @@ export default function EmployeeTable({ employee }) {
             <Table.Cell> {employee.phoneNumber} </Table.Cell>
             <Table.Cell> {employee.paidLeave} </Table.Cell>
             <Table.Cell>
-                <Button.Group>
-                    <Button onClick={() => setModal(!modal) } content="Edit" />
-                </Button.Group>
+                <Button animated="vertical" onClick={() => setModal(!modal)} primary>
+                    <Button.Content visible>Edit</Button.Content>
+                    <Button.Content hidden>
+                        <Icon name='edit' />
+                    </Button.Content>
+                </Button>
+                <Button animated="vertical" onClick={deleteHandle} color="red">
+                    <Button.Content visible>Delete</Button.Content>
+                    <Button.Content hidden>
+                        <Icon name='trash' />
+                    </Button.Content>
+                </Button>
             </Table.Cell>
             <Modal closeIcon onClose={() => setModal(!modal)} dimmer={'blurring'} open={modal}>
                 <Form loading={loading} id="employees-add-form">
