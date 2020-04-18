@@ -73,7 +73,7 @@ export default function EmployeeTable({ employee }) {
 
     return (
         <Table.Row>
-            <Table.Cell> <Image alt={employee.name} fluid src={employee.image_url ? employee.image_url: ImageDefault } size="tiny"/> </Table.Cell>
+            <Table.Cell> <Image alt={employee.name} src={employee.image_url ? employee.image_url: ImageDefault } size="tiny"/> </Table.Cell>
             <Table.Cell> {employee.id} </Table.Cell>
             <Table.Cell> {employee.name} </Table.Cell>
             <Table.Cell> {employee.email} </Table.Cell>
