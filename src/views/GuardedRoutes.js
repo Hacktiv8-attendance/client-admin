@@ -6,7 +6,7 @@ import Dashboard from './Dashboard'
 import Employees from './Employees'
 import NotFound from './NotFound'
 import TopMenu from '../components/TopMenu'
-import Qr from './QR'
+import Qr from '../components/QR'
 
 export default function GuardedRoutes() {
     const history = useHistory()
