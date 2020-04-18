@@ -15,6 +15,11 @@ export default function Landing() {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
 
+    // Guard
+    if(localStorage.getItem('token')) {
+        history.replace('/dashboard')
+    }
+
     const handleLoginClick = (event) => {
         // Guard
         if(!email || !password) return setError('Invalid email/password')
@@ -29,6 +34,7 @@ export default function Landing() {
             .post(loginUrl, { email, password })
             .then(({ data }) => {
                 localStorage.setItem('token', data.token)
+                localStorage.setItem('email', data.payload.email)
                 history.push('/dashboard')
                 setEmail('')
                 setPassword('')

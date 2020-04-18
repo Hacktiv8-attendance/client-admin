@@ -1,10 +1,14 @@
 import React from 'react'
-import { Button } from 'semantic-ui-react'
+
+import './Dashboard.css'
 
 export default function Dashboard() {
+    
     return (
-        <div>
-            <h1>ini dashboard</h1>
+        <div id="dashboard-page">
+            <div id="dashboard-display">
+                <h1>Ini Dashboard</h1>
+            </div>
         </div>
     )
 }
