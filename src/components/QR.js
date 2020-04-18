@@ -21,7 +21,7 @@ export default function QR() {
 
     setInterval(() => {
         setClock(moment(new Date()).format("dddd, MMMM Do YYYY, HH:mm:ss"))
-    }, 1000)
+    }, 10000)
 
     const getQRcode = (event) => {
         setDisabled(true)
@@ -43,7 +43,7 @@ export default function QR() {
                 setInterval(() => {
                     setQR('')
                     setDisabled(false)
-                }, 10000)
+                }, 1000)
             })
     }
 
@@ -53,7 +53,7 @@ export default function QR() {
                 <h2 id="qr-greeting">Good {greetings(Number(clock.substr(-8, 2)))}, have a nice day! </h2>
                 <h2 id="qr-date">{clock.substr(0, (clock.length - 10))}</h2>
                 <h1 id="qr-time">{clock.substr(-8, 8)}</h1>
-                { QR ? <QRcode value={QR} size={150} /> : <Image src={HSQLogo} size="small" /> }
+                { QR ? <QRcode value={QR} size={300} /> : <Image src={HSQLogo} size="medium" /> }
                 <br />
                 <Button
                     id="qr-button"
