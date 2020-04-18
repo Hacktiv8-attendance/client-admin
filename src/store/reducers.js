@@ -1,15 +1,4 @@
 const initialStatus = {
-    // name: '',
-    // password:'',
-    // email: '',
-    // birthDate: '',
-    // address: '',
-    // phoneNumber: '',
-    // role: '',
-    // authLevel: 0,
-    // superior: 0,
-    // paidLeave: 0,
-    // data: {},
     employees: [],
     loading: false,
     error: null

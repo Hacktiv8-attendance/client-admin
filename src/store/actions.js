@@ -36,7 +36,6 @@ export const fetchEmployees = (payload) => {
             console.log('ke hit kesini')
             if(data){
                 dispatch(setEmployees(data))
-                // console.log(data)
             } else {
                 dispatch(setError('Data employees is not found'))
             }
@@ -121,5 +120,3 @@ export const updateEmployee = (payload) => {
         })
     }
 }
-
-
