@@ -1,5 +1,7 @@
 import React from 'react'
 import { useHistory, Switch, Route } from 'react-router-dom'
+import { NotificationContainer } from 'react-notifications'
+import 'react-notifications/lib/notifications.css';
 import './Dashboard.css'
 
 import Dashboard from './Dashboard'
@@ -18,6 +20,7 @@ export default function GuardedRoutes() {
 
     return (
         <div className="guarded-routes"> 
+            <NotificationContainer />
             <TopMenu />
             <Switch>
                 <Route exact path="/dashboard" component={Dashboard} />

@@ -21,7 +21,7 @@ export default function QR() {
 
     setInterval(() => {
         setClock(moment(new Date()).format("dddd, MMMM Do YYYY, HH:mm:ss"))
-    }, 10000)
+    }, 1000)
 
     const getQRcode = (event) => {
         setDisabled(true)
@@ -43,7 +43,7 @@ export default function QR() {
                 setInterval(() => {
                     setQR('')
                     setDisabled(false)
-                }, 1000)
+                }, 10000)
             })
     }
 
