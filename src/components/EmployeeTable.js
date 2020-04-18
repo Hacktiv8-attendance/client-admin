@@ -78,7 +78,7 @@ export default function EmployeeTable({ employee }) {
 
     return (
         <Table.Row>
-            <Table.Cell> <Image loading="lazy" alt={employee.name} src={employee.image_url ? employee.image_url: ImageDefault } size="tiny"/> </Table.Cell>
+            <Table.Cell> <Image alt={employee.name} src={employee.image_url ? employee.image_url: ImageDefault } size="tiny"/> </Table.Cell>
             <Table.Cell> {employee.id} </Table.Cell>
             <Table.Cell> {employee.name} </Table.Cell>
             <Table.Cell> {employee.email} </Table.Cell>
@@ -90,7 +90,7 @@ export default function EmployeeTable({ employee }) {
             <Table.Cell> {employee.phoneNumber} </Table.Cell>
             <Table.Cell> {employee.paidLeave} </Table.Cell>
             <Table.Cell>
-                <Button animated="vertical" onClick={deleteHandle} primary>
+                <Button animated="vertical" onClick={() => setModal(!modal)} primary>
                     <Button.Content visible>Edit</Button.Content>
                     <Button.Content hidden>
                         <Icon name='edit' />
