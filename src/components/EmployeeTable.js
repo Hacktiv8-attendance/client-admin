@@ -4,7 +4,7 @@ import moment from 'moment'
 import ImageDefault from '../assets/ImageDefault.png'
 import Axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateEmployee, deleteEmployee } from '../store/actions'
+import { updateEmployee, deleteEmployee, fetchEmployees } from '../store/actions'
 
 import '../views/Employees.css'
 
@@ -58,11 +58,16 @@ export default function EmployeeTable({ employee }) {
         if(!role) return setError('Please input employees role')
         if(!superior) return setError('Please input employees superior')
         if(!authLevel) return setError('Please input employees authority level')
-        password === dbPassword ? dispatch(updateEmployee({
-            id: employee.id, name, email, birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
-        })) : dispatch(updateEmployee({
-            id: employee.id, name, email, password , birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
-        }))
+        if(password === dbPassword) {
+            dispatch(updateEmployee({
+                id: employee.id, name, email, birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
+            }))
+        } else {
+            dispatch(updateEmployee({
+                id: employee.id, name, email, password , birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
+            }))
+            dispatch(fetchEmployees())
+        }
          
 
         setModal(!modal)
