@@ -96,20 +96,22 @@ export default function Employees() {
     }
 
     const handleSearch = (event, { value }) => {
+        setPage(0)
         setSearch(value)
         setLoadingSearch(true)
 
         if(value.length < 1) {
             setLoadingSearch(false)
-            return setData(employees)
-            // return setData(_.chunk(employees), chunkSize)
+            // return setData(employees)
+            console.log(employees)
+            return setData(_.chunk(employees), chunkSize)
         }
         
         setTimeout(() => {
             const re = new RegExp(_.escapeRegExp(value), 'i')
             const isMatch = (result) => re.test(result.name)
-            // setData(_.chunk(_.filter(employees, isMatch)), chunkSize)
-            setData(_.filter(employees, isMatch))
+            setData(_.chunk(_.filter(employees, isMatch)), chunkSize)
+            // setData(_.filter(employees, isMatch))
             setLoadingSearch(false)
           }, 300)
     }
@@ -144,9 +146,12 @@ export default function Employees() {
         if(employees.length === 0 ) {
             dispatch(fetchEmployees())
         }
-        setData(employees)
-        // setData(_.chunk(employees, chunkSize))
-    }, [dispatch, employees.length, history, employees])
+        if(search.length < 1) {
+            setData(_.chunk(employees, chunkSize))
+        }
+        // setData(employees)
+        setData(_.chunk(employees, chunkSize))
+    }, [dispatch, employees.length, search, history, employees])
 
     return (
         <div id="employees-page">
@@ -256,24 +261,24 @@ export default function Employees() {
                     <Table.Body>
                         { data.length < 1 ? 
                             <EmptyResult /> 
-                            : data.map(employee => <EmployeeTable key={employee.id} employee={employee} />)
+                            : data[page].map(employee => <EmployeeTable key={employee.id} employee={employee} />)
                         }
                     </Table.Body>
                 </Table>
             }
-            {/* { employees.length > chunkSize ? 
+            { employees.length > chunkSize ? 
             <Pagination
                 onPageChange={handlePagination}
+                activePage={page+1}
                 boundaryRange={0}
-                defaultActivePage={1}
                 ellipsisItem={null}
                 firstItem={null}
                 lastItem={null}
                 siblingRange={1}
-                totalPages={Math.ceil(data.length / chunkSize)}
+                disabled={Math.ceil(_.flatten(data).length / chunkSize) > 1 ? false : true}
+                totalPages={Math.ceil(_.flatten(data).length / chunkSize)}
              />
-             : '' } */}
-        
+             : '' }
         </div>
     )
 }
