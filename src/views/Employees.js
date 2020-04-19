@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Form, Table, Dimmer, Loader } from 'semantic-ui-react'
+import { Modal, Button, Form, Table, Dimmer, Loader, Search, Pagination } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux' 
 import { fetchEmployees, createEmployee } from '../store/actions'
+import { useHistory } from 'react-router-dom'
+import Axios from 'axios'
+import _ from 'lodash'
 
 import './Employees.css'
 import EmployeeTable from '../components/EmployeeTable.js'
-import Axios from 'axios'
+import EmptyResult from '../components/EmptyResult.js'
 
 export default function Employees() {
     const dispatch = useDispatch()
+    const history = useHistory()
 
+    
     // Store statement
     let employees = useSelector(state => state.reducers.employees)
     const loading = useSelector(state => state.reducers.loading)
     // const error = useSelector(state => state.reducers.error)
-
+    
+    const chunkSize = 5
     const [modal, setModal] = useState(false)
     const [error, setError] = useState('')
 
@@ -30,6 +36,12 @@ export default function Employees() {
     const [authLevel, setAuthLevel] = useState(0)
     const [photo, setPhoto] = useState("")
     const [paidLeave, setPaidLeave] = useState(12)
+    const [search, setSearch] = useState('')
+    const [activeCol, setActiveCol] = useState(null)
+    const [direction, setDirection] = useState(null)
+    const [data, setData] = useState([])
+    const [loadingSearch, setLoadingSearch] = useState(false)
+    const [page, setPage] = useState(0)
 
     const resetForm = () => {
         setName('')
@@ -60,7 +72,7 @@ export default function Employees() {
         if(!authLevel) return setError('Please input employees authority level')
         
         dispatch(createEmployee({
-            name, email, password, birthDate, address, phoneNumber, superior, role, authLevel, paidLeave, image_url: photo
+            name, email, password, birthDate, address, phoneNumber, superiorId: superior, role, authLevel, paidLeave, image_url: photo
         }))
         setModal(!modal)
         resetForm()
@@ -83,11 +95,59 @@ export default function Employees() {
             })
     }
 
+    const handleSearch = (event, { value }) => {
+        setSearch(value)
+        setLoadingSearch(true)
+
+        if(value.length < 1) {
+            setLoadingSearch(false)
+            return setData(employees)
+            // return setData(_.chunk(employees), chunkSize)
+        }
+        
+        setTimeout(() => {
+            const re = new RegExp(_.escapeRegExp(value), 'i')
+            const isMatch = (result) => re.test(result.name)
+            // setData(_.chunk(_.filter(employees, isMatch)), chunkSize)
+            setData(_.filter(employees, isMatch))
+            setLoadingSearch(false)
+          }, 300)
+    }
+
+    const handleSort = (clickedCol) => {
+        if (activeCol !== clickedCol) {
+            setActiveCol(clickedCol);
+            setData(_.sortBy(data, [clickedCol]));
+            setDirection('ascending');
+
+            return
+        }
+
+        setData(data.reverse())
+        
+        if (direction === 'ascending') {
+            setDirection('descending')
+        } else {
+            setDirection('ascending')
+        }
+    }
+
+    const handlePagination = (event, { activePage }) => {
+        setPage(activePage - 1)
+    }
+
     useEffect(() => {
+        if(localStorage.getItem('qr')) {
+            history.replace('/qr')
+        }
+
         if(employees.length === 0 ) {
             dispatch(fetchEmployees())
         }
-    }, [dispatch, employees.length])
+        setData(employees)
+        // setData(_.chunk(employees, chunkSize))
+    }, [dispatch, employees.length, history, employees])
+
     return (
         <div id="employees-page">
             <Modal closeIcon onClose={() => setModal(!modal)} dimmer={'blurring'} open={modal} >
@@ -163,36 +223,57 @@ export default function Employees() {
                     <Button primary onClick={(event) => handleSubmitForm(event)} content="Submit" />
                 </Form>
             </Modal>
-
-            <h1>Ini Employees</h1>
             <h3>Total Employees: { employees.length } </h3>
-            <Button onClick={() => setModal(!modal)} content="Add Employee" />
+            <div className="employees-nav-container">
+                <Button onClick={() => setModal(!modal)} content="Add Employee" />
+                <Search
+                    onSearchChange={_.debounce(handleSearch, 500, { leading: true, trailing: true })}
+                    open={false}
+                    value={search}
+                    loading={loadingSearch}
+                />
+            </div>
             {/* Table */}
             {loading ? <Dimmer active inverted><Loader inverted>Loading</Loader></Dimmer> : 
-                <Table sortable celled unstackable>
+                <Table sortable celled unstackable singleLine selectable>
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell>Photo</Table.HeaderCell>
-                            <Table.HeaderCell>ID</Table.HeaderCell>
-                            <Table.HeaderCell >Full Name</Table.HeaderCell>
-                            <Table.HeaderCell>Email</Table.HeaderCell>
-                            <Table.HeaderCell>Role</Table.HeaderCell>
-                            <Table.HeaderCell>Superior</Table.HeaderCell>
-                            <Table.HeaderCell>Level</Table.HeaderCell>
+                            <Table.HeaderCell onClick={() => handleSort('id')} sorted={activeCol === 'id' ? direction : null} >ID</Table.HeaderCell>
+                            <Table.HeaderCell onClick={() => handleSort('name')} sorted={activeCol === 'name' ? direction : null}>Full Name</Table.HeaderCell>
+                            <Table.HeaderCell onClick={() => handleSort('email')} sorted={activeCol === 'email' ? direction : null}>Email</Table.HeaderCell>
+                            <Table.HeaderCell onClick={() => handleSort('role')} sorted={activeCol === 'role' ? direction : null}>Role</Table.HeaderCell>
+                            <Table.HeaderCell onClick={() => handleSort('superior')} sorted={activeCol === 'superior' ? direction : null}>Superior</Table.HeaderCell>
+                            <Table.HeaderCell onClick={() => handleSort('authLevel')} sorted={activeCol === 'authLevel' ? direction : null}>Level</Table.HeaderCell>
                             <Table.HeaderCell>Birth Date</Table.HeaderCell>
                             <Table.HeaderCell>Address</Table.HeaderCell>
                             <Table.HeaderCell>Phone Number</Table.HeaderCell>
-                            <Table.HeaderCell>Annual leave remaining</Table.HeaderCell>
+                            <Table.HeaderCell>Annual leave</Table.HeaderCell>
                             <Table.HeaderCell>Actions</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
                     <Table.Body>
-                        { employees.map(employee => <EmployeeTable key={employee.id} employee={employee} />)}
+                        { data.length < 1 ? 
+                            <EmptyResult /> 
+                            : data.map(employee => <EmployeeTable key={employee.id} employee={employee} />)
+                        }
                     </Table.Body>
                 </Table>
             }
-            
+            {/* { employees.length > chunkSize ? 
+            <Pagination
+                onPageChange={handlePagination}
+                boundaryRange={0}
+                defaultActivePage={1}
+                ellipsisItem={null}
+                firstItem={null}
+                lastItem={null}
+                siblingRange={1}
+                totalPages={Math.ceil(data.length / chunkSize)}
+             />
+             : '' } */}
+        
         </div>
     )
 }

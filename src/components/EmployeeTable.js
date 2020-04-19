@@ -6,8 +6,6 @@ import Axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateEmployee, deleteEmployee, fetchEmployees } from '../store/actions'
 
-import '../views/Employees.css'
-
 export default function EmployeeTable({ employee }) {
     const dispatch = useDispatch()
     const loading = useSelector(state => state.reducers.loading)
@@ -20,12 +18,26 @@ export default function EmployeeTable({ employee }) {
     const [address, setAddress] = useState(employee.address)
     const [phoneNumber, setPhoneNumber] = useState(employee.phoneNumber)
     const [role, setRole] = useState(employee.role)
-    const [superior, setSuperior] = useState(employee.superior)
+    const [superior, setSuperior] = useState(employee.SuperiorId)
     const [authLevel, setAuthLevel] = useState(employee.authLevel)
     const [photo, setPhoto] = useState(employee.image_url)
     const [paidLeave, setPaidLeave] = useState(employee.paidLeave)
     const [modal, setModal] = useState(false)
     const [error, setError] = useState('')
+
+    const resetForm = () => {
+        setName(employee.name)
+        setEmail(employee.email)
+        setPassword(employee.password)
+        setBirthDate(employee.birthDate.substr(0, 10))
+        setAddress(employee.add)
+        setPhoneNumber(employee.phoneNumber)
+        setRole(employee.role)
+        setSuperior(employee.SuperiorId)
+        setAuthLevel(employee.authLevel)
+        setPhoto(employee.image_url)
+        setPaidLeave(employee.paidLeave)
+    }
 
     const handleImage = (event) => {
         event.preventDefault()
@@ -60,11 +72,11 @@ export default function EmployeeTable({ employee }) {
         if(!authLevel) return setError('Please input employees authority level')
         if(password === dbPassword) {
             dispatch(updateEmployee({
-                id: employee.id, name, email, birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
+                id: employee.id, name, email, birthDate, address, phoneNumber, role, SuperiorId: superior, image_url: photo, paidLeave, authLevel
             }))
         } else {
             dispatch(updateEmployee({
-                id: employee.id, name, email, password , birthDate, address, phoneNumber, role, superior, image_url: photo, paidLeave, authLevel
+                id: employee.id, name, email, password , birthDate, address, phoneNumber, role, SuperiorId: superior, image_url: photo, paidLeave, authLevel
             }))
             dispatch(fetchEmployees())
         }
@@ -72,6 +84,8 @@ export default function EmployeeTable({ employee }) {
 
         setModal(!modal)
     }
+
+
 
     const getFormatDate = (date) => {
         return setBirthDate(date.substr(0, 10))
@@ -82,13 +96,13 @@ export default function EmployeeTable({ employee }) {
     }
 
     return (
-        <Table.Row>
+        <Table.Row textAlign='center'>
             <Table.Cell> <Image alt={employee.name} src={employee.image_url ? employee.image_url: ImageDefault } size="tiny"/> </Table.Cell>
             <Table.Cell> {employee.id} </Table.Cell>
             <Table.Cell> {employee.name} </Table.Cell>
             <Table.Cell> {employee.email} </Table.Cell>
             <Table.Cell> {employee.role} </Table.Cell>
-            <Table.Cell> {employee.superior} </Table.Cell>
+            <Table.Cell> {employee.SuperiorId   } </Table.Cell>
             <Table.Cell> {employee.authLevel} </Table.Cell>
             <Table.Cell> { moment(employee.birthDate).format('L') } </Table.Cell>
             <Table.Cell> {employee.address} </Table.Cell>
@@ -177,7 +191,14 @@ export default function EmployeeTable({ employee }) {
                         type="file"
                         onChange={(event) => handleImage(event)}
                     />
-                    <Button primary onClick={(event) => handleSubmitForm(event)} content="Submit" />
+                    <div className="employee-edit-container">
+                        <Image id="employee-edit-photo" size="medium" src={photo} />
+                        <Button.Group className="employee-edit-buttons" widths={2}>
+                            <Button primary onClick={(event) => handleSubmitForm(event)} content="Submit" />
+                            <Button color={'red'} onClick={() => { setModal(!modal) ; resetForm()}} content="Cancel" />
+                        </Button.Group>
+                    </div>
+
                 </Form>
             </Modal>
         </Table.Row>

@@ -18,3 +18,32 @@
 .employee-photo{
     object-fit: cover;
 }
+
+.employee-edit-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.employee-edit-buttons{
+    margin-top: 1rem;
+}
+
+#employee-edit-photo{
+    margin-bottom: 15px;
+    border: 4px #30e3ca solid;
+}
+
+.employees-nav-container{
+    display: flex;
+    justify-content: space-between;
+}
+
+.employees-empty-container{
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

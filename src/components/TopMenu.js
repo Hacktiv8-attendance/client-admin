@@ -23,11 +23,19 @@ export default function Menubar() {
 
     const handleNavClick = (event, name, path) => {
         event.preventDefault()
-        history.replace(path)
+
+        if (path === '/qr') {
+          localStorage.setItem('qr', true)
+          history.replace(path)
+        }
+        else {
+          history.replace(path)
+        }
         setActiveItem(name)
     }
 
     const handleQRBack = (event) => {
+      localStorage.removeItem('qr')
       setLoading(true)
       setError('')
       const email = localStorage.getItem('email')
