@@ -21,6 +21,33 @@ export const setEmployees = (value) => {
     }
 }
 
+export const setAbsence = (value) => {
+    return {
+        type: "SET_ABSENCE",
+        payload: value
+    }
+}
+
+export const fetchAbsence = (payload) => (dispatch) => {
+    dispatch(setLoading())
+    axios({
+        method: 'get',
+        url: 'http://localhost:3000/admin/absence',
+        params: {
+            month: payload.month,
+            SuperiorId: payload.SuperiorId
+        },
+        headers: {
+            token: localStorage.token
+        }
+    })
+        .then(({ data }) => {
+            dispatch(setAbsence(data))
+        })
+        .catch(err => {
+            setError(err)
+        })
+}
 
 export const fetchEmployees = (payload) => {
     return function(dispatch) {

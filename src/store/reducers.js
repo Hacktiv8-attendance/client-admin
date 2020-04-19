@@ -1,7 +1,8 @@
 const initialStatus = {
     employees: [],
     loading: false,
-    error: null
+    error: null,
+    absence: []
 }
 
 const reducers = (state = initialStatus, action) => {
@@ -10,6 +11,11 @@ const reducers = (state = initialStatus, action) => {
             return {
                 ...state,
                 employees : action.payload
+            }
+        case "SET_ABSENCE" : 
+            return {
+                ...state,
+                absence : action.payload
             }
         case "SET_LOADING" : 
             return {

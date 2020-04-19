@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import store from './store/store'
 import * as serviceWorker from './serviceWorker';
 import 'semantic-ui-css/semantic.min.css'
-
+import './canvasjs.min.js'
 import { BrowserRouter } from 'react-router-dom'
 
 ReactDOM.render(
