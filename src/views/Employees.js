@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Form, Table, Dimmer, Loader, Search, Pagination } from 'semantic-ui-react'
+import { Modal, Button, Form, Table, Dimmer, Loader, Search, Pagination, Icon } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux' 
 import { fetchEmployees, createEmployee } from '../store/actions'
 import { useHistory } from 'react-router-dom'
@@ -13,14 +13,19 @@ import EmptyResult from '../components/EmptyResult.js'
 export default function Employees() {
     const dispatch = useDispatch()
     const history = useHistory()
-
+    const roleOptions = [
+        { text: 'CEO', value: 'CEO'},
+        { text: 'Manager', value: 'Manager'},
+        { text: 'HRD', value: 'HRD'},
+        { text: 'Staff', value: 'Staff'}
+    ]
     
     // Store statement
     let employees = useSelector(state => state.reducers.employees)
     const loading = useSelector(state => state.reducers.loading)
     // const error = useSelector(state => state.reducers.error)
     
-    const chunkSize = 5
+    const chunkSize = 7 // change this value to change employee shown each page
     const [modal, setModal] = useState(false)
     const [error, setError] = useState('')
 
@@ -119,13 +124,13 @@ export default function Employees() {
     const handleSort = (clickedCol) => {
         if (activeCol !== clickedCol) {
             setActiveCol(clickedCol);
-            setData(_.sortBy(data, [clickedCol]));
+            setData(_.chunk(_.sortBy(_.flatten(data), [clickedCol]), chunkSize));
             setDirection('ascending');
 
             return
         }
 
-        setData(data.reverse())
+        setData(_.chunk(_.sortBy(_.flatten(data), [clickedCol]).reverse(), chunkSize));
         
         if (direction === 'ascending') {
             setDirection('descending')
@@ -197,10 +202,10 @@ export default function Employees() {
                         value={phoneNumber}
                         onChange={(event) => setPhoneNumber(event.target.value)}
                     />
-                    <Form.Input 
+                    <Form.Select 
                         label="Role" 
                         placeholder='Role'
-                        value={role}
+                        options={roleOptions}
                         onChange={(event) => setRole(event.target.value)}
                     />
                     <Form.Input 
@@ -216,8 +221,8 @@ export default function Employees() {
                         onChange={(event) => setAuthLevel(event.target.value)}
                     />
                     <Form.Input 
-                        label="Annual Level" 
-                        placeholder='Annual Level'
+                        label="Annual Leave" 
+                        placeholder='Annual Leave'
                         value={paidLeave}
                         onChange={(event) => setPaidLeave(event.target.value)}
                     />
@@ -266,19 +271,21 @@ export default function Employees() {
                     </Table.Body>
                 </Table>
             }
-            { employees.length > chunkSize ? 
-            <Pagination
-                onPageChange={handlePagination}
-                activePage={page+1}
-                boundaryRange={0}
-                ellipsisItem={null}
-                firstItem={null}
-                lastItem={null}
-                siblingRange={1}
-                disabled={Math.ceil(_.flatten(data).length / chunkSize) > 1 ? false : true}
-                totalPages={Math.ceil(_.flatten(data).length / chunkSize)}
-             />
-             : '' }
+                { employees.length > chunkSize ? 
+                <div className="employees-pagination">
+                    <Pagination
+                        onPageChange={handlePagination}
+                        activePage={page+1}
+                        boundaryRange={0}
+                        ellipsisItem={null}
+                        firstItem={null}
+                        lastItem={null}
+                        siblingRange={1}
+                        disabled={Math.ceil(_.flatten(data).length / chunkSize) > 1 ? false : true}
+                        totalPages={Math.ceil(_.flatten(data).length / chunkSize)}
+                    />
+                </div>
+                : '' }
         </div>
     )
 }

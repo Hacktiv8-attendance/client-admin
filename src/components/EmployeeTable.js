@@ -10,6 +10,13 @@ export default function EmployeeTable({ employee }) {
     const dispatch = useDispatch()
     const loading = useSelector(state => state.reducers.loading)
     const dbPassword = employee.password
+    const roleOptions = [
+        { text: 'CEO', value: 'CEO'},
+        { text: 'Manager', value: 'Manager'},
+        { text: 'HRD', value: 'HRD'},
+        { text: 'Staff', value: 'Staff'}
+    ]
+
     // Edit Form
     const [name, setName] = useState(employee.name)
     const [email, setEmail] = useState(employee.email)
@@ -22,6 +29,8 @@ export default function EmployeeTable({ employee }) {
     const [authLevel, setAuthLevel] = useState(employee.authLevel)
     const [photo, setPhoto] = useState(employee.image_url)
     const [paidLeave, setPaidLeave] = useState(employee.paidLeave)
+
+    // Other state
     const [modal, setModal] = useState(false)
     const [error, setError] = useState('')
 
@@ -163,10 +172,10 @@ export default function EmployeeTable({ employee }) {
                         value={phoneNumber}
                         onChange={(event) => setPhoneNumber(event.target.value)}
                     />
-                    <Form.Input 
+                    <Form.Select 
                         label="Role" 
-                        placeholder='Role'
-                        value={role}
+                        options={roleOptions}
+                        placeholder="Role"
                         onChange={(event) => setRole(event.target.value)}
                     />
                     <Form.Input 
@@ -182,8 +191,8 @@ export default function EmployeeTable({ employee }) {
                         onChange={(event) => setAuthLevel(event.target.value)}
                     />
                     <Form.Input 
-                        label="Annual Level" 
-                        placeholder='Annual Level'
+                        label="Annual Leave" 
+                        placeholder='Annual Leave'
                         value={paidLeave}
                         onChange={(event) => setPaidLeave(event.target.value)}
                     />
