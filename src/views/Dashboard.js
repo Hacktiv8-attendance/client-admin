@@ -6,8 +6,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchAbsence, fetchEmployees } from '../store/actions'
 import { Form, Container, Accordion } from 'semantic-ui-react'
 import CanvasJSReact from '../canvasjs.react';
-const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
+const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 export default function Dashboard() {
 
@@ -35,17 +35,19 @@ export default function Dashboard() {
     const [month, setMonth] = useState("2020-03")
     const [SuperiorId, setSuperiorId] = useState(2)
     const [option, setOption] = useState([])
-    const [activeAccordion, setActiveAccordion] = useState(0)
+    const [activeAccordion, setActiveAccordion] = useState(1)
 
     const options = {
         animationEnabled: true,
         exportEnabled: true,
-        theme: "light1", //"light1", "dark1", "dark2"
-        title:{
-            text: "Simple Column Chart with Index Labels"
-        },
+        theme: "light2", //"light1", "dark1", "dark2"
         axisX: {
+            title: "Name",
             interval: 1
+        },
+        axisY: {
+            title: "Total Absence",
+            interval: 2
         },
         data: [{
             type: "column", //change type to bar, line, area, pie, etc
