@@ -176,7 +176,7 @@ export default function EmployeeTable({ employee }) {
                         label="Role" 
                         options={roleOptions}
                         placeholder="Role"
-                        onChange={(event) => setRole(event.target.value)}
+                        onChange={(event, { value }) => setRole(value)}
                     />
                     <Form.Input 
                         label="Superior ID" 

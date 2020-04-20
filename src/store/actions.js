@@ -140,7 +140,7 @@ export const updateEmployee = (payload) => {
             dispatch({ type: "UPDATE_EMPLOYEE", payload: data})
         })
         .catch(err => {
-            console.log(err)
+            console.log(err.response)
             dispatch(setError('Update Employee Failed'))
         })
         .finally(() => {

@@ -29,7 +29,6 @@ export default function Landing() {
         event.preventDefault()
         setError('')
         setLoading(true)
-
         axios
             .post(loginUrl, { email, password })
             .then(({ data }) => {

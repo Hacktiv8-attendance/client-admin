@@ -9,17 +9,8 @@ var CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 export default function Dashboard() {
-    let absence = useSelector(state => state.reducers.absence)
-    let employees = useSelector(state => state.reducers.employees)
-    const loading = useSelector(state => state.reducers.loading)
-    const history = useHistory()
-    const dispatch = useDispatch()
-
-    const [month, setMonth] = useState("2020-03")
-    const [SuperiorId, setSuperiorId] = useState(2)
-    const [option, setOption] = useState([])
     const monthOption = [
-        {value: '2020-01', text: 'January'},
+        {key: "asd", value: '2020-01', text: 'January'},
         {value: '2020-02', text: 'February'},
         {value: '2020-03', text: 'March'},
         {value: '2020-04', text: 'April'},
@@ -30,9 +21,18 @@ export default function Dashboard() {
         {value: '2020-09', text: 'September'},
         {value: '2020-10', text: 'October'},
         {value: '2020-11', text: 'November'},
-        {value: '2020-12', text: 'December'},
-        
+        {value: '2020-12', text: 'December'},   
     ]
+    let absence = useSelector(state => state.reducers.absence)
+    let employees = useSelector(state => state.reducers.employees)
+    const loading = useSelector(state => state.reducers.loading)
+    const history = useHistory()
+    const dispatch = useDispatch()
+
+    const [month, setMonth] = useState("2020-03")
+    const [SuperiorId, setSuperiorId] = useState(2)
+    const [option, setOption] = useState([])
+
     const options = {
         animationEnabled: true,
         exportEnabled: true,
@@ -86,23 +86,22 @@ export default function Dashboard() {
     return (
         <div id="dashboard-page">
             <div id="dashboard-display">
-                <h1>Ini Dashboard</h1>
                 <div>
-                <Form loading={loading ? true : false}>
+                <Form>
                     <Form.Group widths='equal'>
                         <Form.Select 
-                            fluid
+                            // fluid
                             label="Month" 
                             placeholder='Month'
                             options={monthOption}
-                            onChange={(event) => setMonth(event.target.value)}
+                            onChange={(event, { value }) => setMonth(value)}
                         />
                         <Form.Select 
                             fluid
                             label="Manager" 
                             placeholder='Manager'
                             options={option}
-                            onChange={(event) => setSuperiorId(event.target.value)}
+                            onChange={(event, { value }) => setSuperiorId(value)}
                         />
                     </Form.Group>
                     <Button primary onClick={(event) => handleClick(event)} content="Submit" />
