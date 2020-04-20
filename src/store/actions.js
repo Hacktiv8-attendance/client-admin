@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { NotificationManager } from 'react-notifications'
+const serverUrl = 'http://localhost:3000'
 
 export const setLoading = (value) => {
     return {
@@ -28,11 +30,18 @@ export const setAbsence = (value) => {
     }
 }
 
+export const setMessages = (value) => {
+    return {
+        type: "SET_MESSAGES",
+        payload: value
+    }
+}
+
 export const fetchAbsence = (payload) => (dispatch) => {
-    dispatch(setLoading())
+    dispatch(setLoading(true))
     axios({
         method: 'get',
-        url: 'http://localhost:3000/admin/absence',
+        url: `${serverUrl}/admin/absence`,
         params: {
             month: payload.month,
             SuperiorId: payload.SuperiorId
@@ -41,12 +50,15 @@ export const fetchAbsence = (payload) => (dispatch) => {
             token: localStorage.token
         }
     })
-        .then(({ data }) => {
-            dispatch(setAbsence(data))
-        })
-        .catch(err => {
-            setError(err)
-        })
+    .then(({ data }) => {
+        dispatch(setAbsence(data))
+    })
+    .catch(err => {
+        setError(err)
+    })
+    .finally(() => {
+        dispatch(setLoading(false))
+    })
 }
 
 export const fetchEmployees = (payload) => {
@@ -54,7 +66,7 @@ export const fetchEmployees = (payload) => {
         dispatch(setLoading(true))
         axios({
             method: 'get',
-            url: 'http://localhost:3000/admin/employee',
+            url: `${serverUrl}/admin/employee`,
             headers: {
                 token: localStorage.token
             }
@@ -80,7 +92,7 @@ export const createEmployee = (payload) => {
         dispatch(setLoading(true))
         axios({
             method: 'post',
-            url: 'http://localhost:3000/admin/employee',
+            url: `${serverUrl}/admin/employee`,
             data: payload,
             headers: {
                 token: localStorage.token
@@ -93,7 +105,6 @@ export const createEmployee = (payload) => {
             })
         })
         .catch( err => {
-            console.log(err)
             dispatch(setError('Failed create data new employee'))
         })
         .finally(() => {
@@ -107,9 +118,9 @@ export const deleteEmployee = (payload) => {
         dispatch(setLoading(true))
         axios({
             method: 'delete',
-            url: `http://localhost:3000/admin/employee/${payload}`,
+            url: `${serverUrl}/admin/employee/${payload}`,
             headers: {
-                token: localStorage.token
+                token: localStorage.getItem('token')
             }
         })
         .then(({data}) => {
@@ -130,18 +141,70 @@ export const updateEmployee = (payload) => {
         dispatch(setLoading(true))
         axios({
             method: 'put',
-            url: `http://localhost:3000/admin/employee/${payload.id}`,
+            url: `${serverUrl}/admin/employee/${payload.id}`,
             data: payload,
             headers: {
-                token : localStorage.token
+                token : localStorage.getItem('token')
             }
         })
         .then(({ data }) => {
             dispatch({ type: "UPDATE_EMPLOYEE", payload: data})
         })
         .catch(err => {
-            console.log(err.response)
             dispatch(setError('Update Employee Failed'))
+        })
+        .finally(() => {
+            dispatch(setLoading(false))
+        })
+    }
+}
+
+export const fetchMessages = (value) => {
+    return function (dispatch) {
+        dispatch(setLoading(true))
+        axios({
+            method: "GET",
+            url: `${serverUrl}/admin/message`,
+            headers: {
+                token: localStorage.getItem('token')
+            }
+        })
+            .then(({ data }) => {
+                dispatch({
+                    type: "SET_MESSAGES",
+                    payload: data
+                })
+            })
+            .catch(err => {
+                dispatch(setError(err))
+            }) 
+            .finally(() => {
+                setLoading(false)
+            })
+    }
+}
+
+export const broadcastMessage = (payload) => {
+    return function (dispatch) {
+        dispatch(setLoading(true))
+        axios({
+            method: "POST",
+            url: `${serverUrl}/admin/message`,
+            data: payload,
+            headers: {
+                token: localStorage.token
+            }
+        })
+        .then(({ data }) => {
+            dispatch({
+                type: "ADD_MESSAGE",
+                payload: data
+            })
+            NotificationManager.success(payload.message, "BROADCASTED!")
+            return data
+        })
+        .catch(err => {
+            dispatch(setError('Failed to broadcast message'))
         })
         .finally(() => {
             dispatch(setLoading(false))

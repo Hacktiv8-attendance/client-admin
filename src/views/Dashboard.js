@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import './Dashboard.css'
+import DashboardBroadcast from '../components/DashboardBroadcast'
 import { useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchAbsence, fetchEmployees } from '../store/actions'
-import { Form, Button } from 'semantic-ui-react'
+import { Form, Container } from 'semantic-ui-react'
 import CanvasJSReact from '../canvasjs.react';
-var CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
+
 export default function Dashboard() {
+
     const monthOption = [
         {key: "asd", value: '2020-01', text: 'January'},
         {value: '2020-02', text: 'February'},
@@ -23,6 +25,7 @@ export default function Dashboard() {
         {value: '2020-11', text: 'November'},
         {value: '2020-12', text: 'December'},   
     ]
+
     let absence = useSelector(state => state.reducers.absence)
     let employees = useSelector(state => state.reducers.employees)
     const loading = useSelector(state => state.reducers.loading)
@@ -54,7 +57,6 @@ export default function Dashboard() {
     
     const handleClick = (event) => {
         event.preventDefault()
-        console.log(month, SuperiorId)
         dispatch(fetchAbsence({month, SuperiorId}))
     }
 
@@ -76,42 +78,40 @@ export default function Dashboard() {
                         value: el.id
                     }
                     manager.push(payload)
-                    return
                 }
+                return null
             })
             setOption(manager)
         }
     }, [history, absence.length, month, employees.length, dispatch, SuperiorId, employees])
-    if(loading) return <div>Loading....</div>
     return (
         <div id="dashboard-page">
-            <div id="dashboard-display">
-                <div>
-                <Form>
+            <div id="dashboard-chart">
+                <h1>Monthly Attendance Report</h1>
+                <Form loading={loading} className="dashboard-chart-form">
                     <Form.Group widths='equal'>
                         <Form.Select 
-                            // fluid
-                            label="Month" 
                             placeholder='Month'
                             options={monthOption}
                             onChange={(event, { value }) => setMonth(value)}
                         />
                         <Form.Select 
-                            fluid
-                            label="Manager" 
                             placeholder='Manager'
                             options={option}
                             onChange={(event, { value }) => setSuperiorId(value)}
                         />
+                        <Form.Button 
+                            onClick={(event) => handleClick(event)} 
+                            content="Submit" 
+                        />                            
                     </Form.Group>
-                    <Button primary onClick={(event) => handleClick(event)} content="Submit" />
                 </Form>
-                <CanvasJSChart options = {options}
-                        /* onRef={ref => this.chart = ref} */
-                    />
+                <CanvasJSChart options={options} />
                     {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
-                </div>
             </div>
+            <Container>
+                <DashboardBroadcast />
+            </Container>
         </div>
     )
 }

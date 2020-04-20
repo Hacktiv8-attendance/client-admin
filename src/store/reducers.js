@@ -1,8 +1,11 @@
+import _ from 'lodash'
+
 const initialStatus = {
     employees: [],
     loading: false,
     error: null,
-    absence: []
+    absence: [],
+    messages: []
 }
 
 const reducers = (state = initialStatus, action) => {
@@ -27,6 +30,11 @@ const reducers = (state = initialStatus, action) => {
                 ...state,
                 error : action.payload
             }
+        case "SET_MESSAGES" : 
+            return {
+                ...state,
+                messages: action.payload
+            }
         case "ADD_EMPLOYEE" :
             return {
                 ...state,
@@ -47,6 +55,11 @@ const reducers = (state = initialStatus, action) => {
             return {
                 ...state,
                 employees: temp
+            }
+        case "ADD_MESSAGE" :
+            return {
+                ...state,
+                messages: _.take([action.payload, ...state.messages], 5)
             }
         default: 
             return state

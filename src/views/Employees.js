@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Form, Table, Dimmer, Loader, Search, Pagination, Icon } from 'semantic-ui-react'
+import { Modal, Button, Form, Table, Dimmer, Loader, Search, Pagination } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux' 
 import { fetchEmployees, createEmployee } from '../store/actions'
 import { useHistory } from 'react-router-dom'
