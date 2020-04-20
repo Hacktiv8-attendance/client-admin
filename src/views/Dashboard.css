@@ -21,7 +21,6 @@
 
 #dashboard-broadcast-message{
     margin-top: 50px;
-    border-top: 5px solid black;
     text-align: center;
     margin-bottom: 75px;
 }
@@ -45,4 +44,18 @@
 
 #dashboard-broadcast-table{
     margin-top: 15px;
+}
+
+#dashboard-broadcast-table{
+    display: flex;
+    justify-content: center;
+}
+
+#dashboard-broadcast-counter{
+    display: block;
+    text-align: end;
+}
+
+.field{
+    margin-bottom: 0 !important;
 }

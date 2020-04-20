@@ -14,9 +14,11 @@ export default function DashboardBroadcast() {
     const [modal, setModal] = useState(false)
 
     const handleBroadcastSubmit = (event) => {
-        if(!message) return NotificationManager.warning("Please input message", "ERROR")
-
         event.preventDefault()
+
+        if(!message) return NotificationManager.warning("Please input message", "ERROR")
+        if(message.length > 255) return NotificationManager.warning("Message can't be longer than 255 characters", "ERROR")
+
         dispatch(broadcastMessage({ message }))
         setMessage('')
         setModal(!modal)
@@ -36,19 +38,21 @@ export default function DashboardBroadcast() {
                         value={message}
                         placeholder="Message"
                         onChange={(event) => setMessage(event.target.value)} />
+                    <small id="dashboard-broadcast-counter" style={{ color: message.length > 255 ? 'red' : 'black' }}>{message.length}/255</small>
 
                     <Form.Button 
                         // onClick={(event) => handleBroadcastSubmit(event)}
                         onClick={() => {
-                            if(!message) return NotificationManager.warning("Please input message", "ERROR") 
+                            if(!message) return NotificationManager.warning("Please input message", "ERROR")
                             setModal(!modal)
                         }}
                         content="Submit"
+                        disabled={message.length > 255 ? true : false}
                     />
                 </Form>
             </div>
             <div id="dashboard-broadcast-table">
-                <Table sortable celled unstackable singleLine selectable>
+                <Table padded fixed singleLine>
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell>Date</Table.HeaderCell>

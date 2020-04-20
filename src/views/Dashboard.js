@@ -4,7 +4,7 @@ import DashboardBroadcast from '../components/DashboardBroadcast'
 import { useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchAbsence, fetchEmployees } from '../store/actions'
-import { Form, Container } from 'semantic-ui-react'
+import { Form, Container, Accordion } from 'semantic-ui-react'
 import CanvasJSReact from '../canvasjs.react';
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -35,6 +35,7 @@ export default function Dashboard() {
     const [month, setMonth] = useState("2020-03")
     const [SuperiorId, setSuperiorId] = useState(2)
     const [option, setOption] = useState([])
+    const [activeAccordion, setActiveAccordion] = useState(0)
 
     const options = {
         animationEnabled: true,
@@ -86,32 +87,49 @@ export default function Dashboard() {
     }, [history, absence.length, month, employees.length, dispatch, SuperiorId, employees])
     return (
         <div id="dashboard-page">
-            <div id="dashboard-chart">
-                <h1>Monthly Attendance Report</h1>
-                <Form loading={loading} className="dashboard-chart-form">
-                    <Form.Group widths='equal'>
-                        <Form.Select 
-                            placeholder='Month'
-                            options={monthOption}
-                            onChange={(event, { value }) => setMonth(value)}
-                        />
-                        <Form.Select 
-                            placeholder='Manager'
-                            options={option}
-                            onChange={(event, { value }) => setSuperiorId(value)}
-                        />
-                        <Form.Button 
-                            onClick={(event) => handleClick(event)} 
-                            content="Submit" 
-                        />                            
-                    </Form.Group>
-                </Form>
-                <CanvasJSChart options={options} />
-                    {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
-            </div>
-            <Container>
-                <DashboardBroadcast />
-            </Container>
+            <Accordion exclusive={false} fluid styled>
+                <Accordion.Title
+                    active={activeAccordion === 1}
+                    content="Monthly Chart"
+                    onClick={(event) => activeAccordion === 1 ? setActiveAccordion(-1) : setActiveAccordion(1) }
+                />
+                <Accordion.Content active={activeAccordion === 1}>
+                    <div id="dashboard-chart">
+                        <h1>Monthly Attendance Report</h1>
+                        <Form loading={loading} className="dashboard-chart-form">
+                            <Form.Group widths='equal'>
+                                <Form.Select 
+                                    placeholder='Month'
+                                    options={monthOption}
+                                    onChange={(event, { value }) => setMonth(value)}
+                                />
+                                <Form.Select 
+                                    placeholder='Manager'
+                                    options={option}
+                                    onChange={(event, { value }) => setSuperiorId(value)}
+                                />
+                                <Form.Button 
+                                    onClick={(event) => handleClick(event)} 
+                                    content="Submit" 
+                                />                            
+                            </Form.Group>
+                        </Form>
+                        <CanvasJSChart options={options} />
+                            {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+                    </div>
+                </Accordion.Content>
+                <Accordion.Title
+                    active={activeAccordion === 2}
+                    content="Broadcast Message"
+                    onClick={(event) => activeAccordion === 2 ? setActiveAccordion(-2) : setActiveAccordion(2) }
+                />
+                <Accordion.Content active={activeAccordion === 2}>
+                    <Container>
+                        <DashboardBroadcast />
+                    </Container>
+                </Accordion.Content>
+
+            </Accordion>
         </div>
     )
 }
