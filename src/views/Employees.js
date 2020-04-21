@@ -89,7 +89,7 @@ export default function Employees() {
         newForm.append('image', event.target.files[0])
         Axios({
             method: "POST",
-            url: "http://localhost:3000/admin/upload",
+            url: "http://18.138.253.176/admin/upload",
             headers: {
                 token: localStorage.token
             },

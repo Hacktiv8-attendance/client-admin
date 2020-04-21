@@ -10,9 +10,8 @@ import CanvasJSReact from '../canvasjs.react';
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 export default function Dashboard() {
-
     const monthOption = [
-        {key: "asd", value: '2020-01', text: 'January'},
+        {value: '2020-01', text: 'January'},
         {value: '2020-02', text: 'February'},
         {value: '2020-03', text: 'March'},
         {value: '2020-04', text: 'April'},

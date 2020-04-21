@@ -25,10 +25,11 @@ export default function Landing() {
         if(!email || !password) return setError('Invalid email/password')
 
         // if email and password filled
-        const loginUrl = "http://localhost:3000/admin/login"
+        const loginUrl = "http://18.138.253.176/admin/login"
         event.preventDefault()
         setError('')
         setLoading(true)
+        console.log(loginUrl)
         axios
             .post(loginUrl, { email, password })
             .then(({ data }) => {
