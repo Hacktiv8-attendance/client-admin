@@ -31,7 +31,7 @@ export default function QR() {
 
         axios({
             method: "GET",
-            url: "http://localhost:3000/admin/QR",
+            url: "http://18.138.253.176/admin/QR",
             headers: { token }
         })
             .then(({ data }) => {

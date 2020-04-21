@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { NotificationManager } from 'react-notifications'
-const serverUrl = 'http://localhost:3000'
+const serverUrl = 'http://18.138.253.176'
 
 export const setLoading = (value) => {
     return {
@@ -179,7 +179,7 @@ export const fetchMessages = (value) => {
                 dispatch(setError(err))
             }) 
             .finally(() => {
-                setLoading(false)
+                dispatch(setLoading(false))
             })
     }
 }

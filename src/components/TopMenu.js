@@ -40,7 +40,7 @@ export default function Menubar() {
       setError('')
       const email = localStorage.getItem('email')
       
-      axios.post('http://localhost:3000/admin/login', { email, password })
+      axios.post('http://18.138.253.176/admin/login', { email, password })
       .then(_ => {
           setPassword('')
           setError('')
