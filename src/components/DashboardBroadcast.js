@@ -11,15 +11,21 @@ export default function DashboardBroadcast() {
     const messages = useSelector(state => state.reducers.messages)
     const dispatch = useDispatch()
     const [message, setMessage] = useState('')
+    const [title, setTitle] = useState('')
     const [modal, setModal] = useState(false)
 
     const handleBroadcastSubmit = (event) => {
         event.preventDefault()
 
+        // Guard
+        if(!title) return NotificationManager.warning("Please input title", "ERROR")
+        if(title.length < 5) return NotificationManager.warning("Title at least 5 characters", "ERROR")
+        if(title.length > 25) return NotificationManager.warning("Title can't be longer than 25 characters", "ERROR")
+
         if(!message) return NotificationManager.warning("Please input message", "ERROR")
         if(message.length > 255) return NotificationManager.warning("Message can't be longer than 255 characters", "ERROR")
 
-        dispatch(broadcastMessage({ message }))
+        dispatch(broadcastMessage({ title, message }))
         setMessage('')
         setModal(!modal)
     }
@@ -30,24 +36,31 @@ export default function DashboardBroadcast() {
 
     return (
         <div id="dashboard-broadcast-message">
-            <h1>Broadcast message to all employees</h1>
+            <h1 style={{ backgroundColor: "#e4f9f5" }}>Broadcast message to all employees</h1>
             <div id="dashboard-broadcast-form">
                 <Form>
+                    <Form.Input
+                        label="Title"
+                        value={title}
+                        placeholder="Title"
+                        onChange={(event) => setTitle(event.target.value)}
+                    />
+                    <small className="dashboard-broadcast-counter" style={{ color: title.length > 25 || title.length < 5 ? 'red' : 'black' }}>{title.length}/25</small>
+                    <br />
                     <Form.TextArea 
                         label="Message"
                         value={message}
                         placeholder="Message"
                         onChange={(event) => setMessage(event.target.value)} />
-                    <small id="dashboard-broadcast-counter" style={{ color: message.length > 255 ? 'red' : 'black' }}>{message.length}/255</small>
+                    <small className="dashboard-broadcast-counter" style={{ color: message.length > 255 ? 'red' : 'black' }}>{message.length}/255</small>
 
                     <Form.Button 
-                        // onClick={(event) => handleBroadcastSubmit(event)}
+                        style={{ backgroundColor: "#30e3ca", color: "white" }}
                         onClick={() => {
-                            if(!message) return NotificationManager.warning("Please input message", "ERROR")
                             setModal(!modal)
                         }}
                         content="Submit"
-                        disabled={message.length > 255 ? true : false}
+                        disabled={message.length > 255 ? true : false } 
                     />
                 </Form>
             </div>
@@ -56,6 +69,7 @@ export default function DashboardBroadcast() {
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell>Date</Table.HeaderCell>
+                            <Table.HeaderCell>Title</Table.HeaderCell>
                             <Table.HeaderCell>Message</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
@@ -74,6 +88,8 @@ export default function DashboardBroadcast() {
                     <Modal.Content>
                         <div className="broadcast-modal-body">
                             <Modal.Description>Are you sure want to broadcast</Modal.Description>
+                            <br /><br />
+                            <Modal.Description><h3>{title}</h3></Modal.Description>
                             <br />
                             <Modal.Description>"{message}"</Modal.Description>
                         </div>

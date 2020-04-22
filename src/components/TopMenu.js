@@ -69,16 +69,17 @@ export default function Menubar() {
             content="Home"
           />
           <Modal className="confirmation" onClose={() => setModal(!modal)} dimmer={'blurring'} open={modal} closeIcon>
-            <Form className="form-confirmation">
+            <Form autoComplete="chrome-off" className="form-confirmation">
               <h2>Please Type Your Password</h2>
               { error && <h5>{ error }</h5>}
-              <Form.Input 
+              <Form.Input
+                autoComplete="new-password"
                 type="password" 
                 onChange={(event) => setPassword(event.target.value)} 
                 placeholder='Password' 
                 value={password} />
               <br />
-              <Button loading={loading} primary type='submit' onClick={(event) => handleQRBack(event)}>Confirm</Button>
+              <Button style={{ backgroundColor: "#11999e" }} loading={loading} primary type='submit' onClick={(event) => handleQRBack(event)}>Confirm</Button>
             </Form>
           </Modal>
         </Menu>

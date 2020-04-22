@@ -8,7 +8,7 @@ export default function NotFound() {
     return (
         <div id="notfound-page">
             <Container id="notfound-container">
-                <Image onClick={() => console.log("testr")} src={EmptyImage} />
+                <Image src={EmptyImage} />
                 <h1>Ooppss you came to wrong place, please go back :)</h1>
             </Container>
         </div>

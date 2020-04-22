@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Modal, Button, Form, Table, Dimmer, Loader, Search, Pagination } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux' 
-import { fetchEmployees, createEmployee } from '../store/actions'
+import { fetchEmployees, createEmployee, setError } from '../store/actions'
 import { useHistory } from 'react-router-dom'
 import Axios from 'axios'
 import _ from 'lodash'
@@ -9,76 +9,93 @@ import _ from 'lodash'
 import './Employees.css'
 import EmployeeTable from '../components/EmployeeTable.js'
 import EmptyResult from '../components/EmptyResult.js'
+import moment from 'moment'
 
 export default function Employees() {
     const dispatch = useDispatch()
     const history = useHistory()
+    
+    // Store statement
+    let employees = useSelector(state => state.reducers.employees)
+    const loading = useSelector(state => state.reducers.loading)
+    const error = useSelector(state => state.reducers.error)
+    
+    const chunkSize = 7 // change this value to change employee shown each page
+    const [modal, setModal] = useState(false)
+    const superiorOptions = _.chain(employees)
+                                .filter(employee => employee.authLevel < 3)
+                                .map(employee => ({ text: `${employee.id} - ${employee.name}`, value: employee.id }))
+                                .value()
     const roleOptions = [
         { text: 'CEO', value: 'CEO'},
         { text: 'Manager', value: 'Manager'},
         { text: 'HRD', value: 'HRD'},
         { text: 'Staff', value: 'Staff'}
     ]
-    
-    // Store statement
-    let employees = useSelector(state => state.reducers.employees)
-    const loading = useSelector(state => state.reducers.loading)
-    // const error = useSelector(state => state.reducers.error)
-    
-    const chunkSize = 7 // change this value to change employee shown each page
-    const [modal, setModal] = useState(false)
-    const [error, setError] = useState('')
+    const authOptions = [
+        { text: 1, value: 1},
+        { text: 2, value: 2},
+        { text: 3, value: 3},
+    ]
+                                
 
     // State for form
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [birthDate, setBirthDate] = useState('')
-    const [address, setAddress] = useState('')
-    const [phoneNumber, setPhoneNumber] = useState('')
-    const [role, setRole] = useState('')
-    const [superior, setSuperior] = useState(0)
-    const [authLevel, setAuthLevel] = useState(0)
-    const [photo, setPhoto] = useState("")
-    const [paidLeave, setPaidLeave] = useState(12)
+    const [photo, setPhoto] = useState('')
     const [search, setSearch] = useState('')
     const [activeCol, setActiveCol] = useState(null)
     const [direction, setDirection] = useState(null)
     const [data, setData] = useState([])
     const [loadingSearch, setLoadingSearch] = useState(false)
     const [page, setPage] = useState(0)
+    const [formContent, setFormContent] = useState({
+        name: '',
+        email: '',
+        password: '',
+        birthDate: moment().format('YYYY-MM-DD'),
+        address: '',
+        phoneNumber: '',
+        role: '',
+        superiorId: 0,
+        authLevel: 0,
+        paidLeave: 12,
+    })
+
+    const handleChange = (event) => {
+        const { name, value } = event.target
+        setFormContent({ ...formContent, [name]: value })
+    }
 
     const resetForm = () => {
-        setName('')
-        setEmail('')
-        setPassword('')
-        setBirthDate('')
-        setAddress('')
-        setPhoneNumber('')
-        setRole('')
-        setSuperior(0)
-        setAuthLevel(0)
-        setPhoto('')
+        setFormContent({
+            name: '',
+            email: '',
+            password: '',
+            birthDate: moment().format('YYYY-MM-DD'),
+            address: '',
+            phoneNumber: '',
+            role: '',
+            superiorId: 0,
+            authLevel: 0,
+            paidLeave: 12,
+        })
     }
 
     const handleSubmitForm = (event) => {
-        setError('')
+        dispatch(setError(null))
         event.preventDefault()
         
         // Guard
-        if(!name) return setError('Please input employees Full Name')
-        if(!email) return setError('Please input employees email')
-        if(!password) return setError('Please input employees password')
-        if(!birthDate) return setError('Please input employees birth date')
-        if(!address) return setError('Please input employees address')
-        if(!phoneNumber) return setError('Please input employees phone number')
-        if(!role) return setError('Please input employees role')
-        if(!superior) return setError('Please input employees superior')
-        if(!authLevel) return setError('Please input employees authority level')
+        if(!formContent.name) return dispatch(setError("Please input employee's name"))
+        if(!formContent.email) return dispatch(setError('Please input employees email'))
+        if(!formContent.password) return dispatch(setError('Please input employees password'))
+        if(!formContent.birthDate) return dispatch(setError('Please input employees birth date'))
+        if(!formContent.address) return dispatch(setError('Please input employees address'))
+        if(!formContent.phoneNumber) return dispatch(setError('Please input employees phone number'))
+        if(!formContent.role) return dispatch(setError('Please input employees role'))
+        if(!formContent.superiorId) return dispatch(setError('Please input employees superior'))
+        if(!formContent.authLevel) return dispatch(setError('Please input employees authority level'))
         
-        dispatch(createEmployee({
-            name, email, password, birthDate, address, phoneNumber, superiorId: superior, role, authLevel, paidLeave, image_url: photo
-        }))
+        dispatch(createEmployee({ ...formContent, image_url: photo }))
         setModal(!modal)
         resetForm()
     }
@@ -107,8 +124,6 @@ export default function Employees() {
 
         if(value.length < 1) {
             setLoadingSearch(false)
-            // return setData(employees)
-            console.log(employees)
             return setData(_.chunk(employees), chunkSize)
         }
         
@@ -116,7 +131,6 @@ export default function Employees() {
             const re = new RegExp(_.escapeRegExp(value), 'i')
             const isMatch = (result) => re.test(result.name)
             setData(_.chunk(_.filter(employees, isMatch)), chunkSize)
-            // setData(_.filter(employees, isMatch))
             setLoadingSearch(false)
           }, 300)
     }
@@ -125,16 +139,21 @@ export default function Employees() {
         if (activeCol !== clickedCol) {
             setActiveCol(clickedCol);
             setData(_.chunk(_.sortBy(_.flatten(data), [clickedCol]), chunkSize));
-            setDirection('ascending');
+
+            if (direction === 'ascending') {
+                setDirection('descending')
+            } else {
+                setDirection('ascending')
+            };
 
             return
         }
 
-        setData(_.chunk(_.sortBy(_.flatten(data), [clickedCol]).reverse(), chunkSize));
-        
         if (direction === 'ascending') {
+            setData(_.chunk(_.sortBy(_.flatten(data), [clickedCol]).reverse(), chunkSize));
             setDirection('descending')
         } else {
+            setData(_.chunk(_.sortBy(_.flatten(data), [clickedCol]), chunkSize));
             setDirection('ascending')
         }
     }
@@ -154,80 +173,106 @@ export default function Employees() {
         if(search.length < 1) {
             setData(_.chunk(employees, chunkSize))
         }
-        // setData(employees)
         setData(_.chunk(employees, chunkSize))
     }, [dispatch, employees.length, search, history, employees])
 
     return (
         <div id="employees-page">
-            <Modal closeIcon onClose={() => setModal(!modal)} dimmer={'blurring'} open={modal} >
-                <Modal.Header>Add Employee</Modal.Header>
+            <Modal closeIcon onClose={() => { setModal(!modal); dispatch(setError(null)); resetForm() }} dimmer={'blurring'} open={modal} >
+                <Modal.Header>Add New Employee</Modal.Header>
                 <Form loading={loading} id="employees-add-form">
                     { error && <h6 id="employees-add-error"> { error } </h6> }
                     <Form.Input 
+                        className="employee-add-form-input"
                         label="Full name" 
                         placeholder='Full Name'
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
+                        name="name"
+                        value={formContent.name}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         label="Email" 
+                        name="email"
                         placeholder='Email'
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
+                        value={formContent.email}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         type="password"
+                        name="password"
                         label="Password" 
                         placeholder='Password'
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
+                        value={formContent.password}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         type="date"
+                        name="birthDate"
                         label="Birth Date" 
                         placeholder='Birth Date'
-                        value={birthDate}
-                        onChange={(event) => setBirthDate(event.target.value)}
+                        value={formContent.birthDate}
+                        onChange={handleChange}
                     />
                     <Form.TextArea 
+                        className="employee-add-form-input"
                         label="Address" 
                         placeholder='Address'
-                        value={address}
-                        onChange={(event) => setAddress(event.target.value)}
+                        name="address"
+                        value={formContent.address}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         label="PhoneNumber" 
                         placeholder='PhoneNumber'
-                        value={phoneNumber}
-                        onChange={(event) => setPhoneNumber(event.target.value)}
+                        name="phoneNumber"
+                        value={formContent.phoneNumber}
+                        onChange={handleChange}
                     />
                     <Form.Select 
-                        label="Role" 
-                        placeholder='Role'
+                        className="employee-add-form-input"
+                        label="Role"
+                        placeholder="Role"
+                        name="role"
+                        value={formContent.role}
                         options={roleOptions}
-                        onChange={(event, {value}) => setRole(value)}
+                        onChange={(event, target) => handleChange({ target })}
                     />
-                    <Form.Input 
-                        label="Superior ID" 
-                        placeholder='Superior ID'
-                        value={superior}
-                        onChange={(event) => setSuperior(event.target.value)}
+                    <Form.Select
+                        className="employee-add-form-input"
+                        label="Superior ID"
+                        placeholder="Superior ID"
+                        search
+                        searchInput={{ id: "superiorId" }}
+                        name="superiorId"
+                        value={formContent.superiorId}
+                        options={superiorOptions}
+                        onChange={(event, target) => handleChange({ target })}
                     />
-                    <Form.Input 
+                    <Form.Select 
+                        className="employee-add-form-input"
                         label="Authority Level" 
-                        placeholder='Authority Level'
-                        value={authLevel}
-                        onChange={(event) => setAuthLevel(event.target.value)}
+                        placeholder="Authority Level"
+                        options={authOptions}
+                        name="authLevel"
+                        value={formContent.authLevel}
+                        onChange={(event, target) => handleChange({ target })}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         label="Annual Leave" 
                         placeholder='Annual Leave'
-                        value={paidLeave}
-                        onChange={(event) => setPaidLeave(event.target.value)}
+                        name="paidLeave"
+                        value={formContent.paidLeave}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         type="file"
+                        label="Employee Photo"
                         onChange={(event) => handleImage(event)}
                     />
                     <Button primary onClick={(event) => handleSubmitForm(event)} content="Submit" />
@@ -235,7 +280,7 @@ export default function Employees() {
             </Modal>
             <h3>Total Employees: { employees.length } </h3>
             <div className="employees-nav-container">
-                <Button onClick={() => setModal(!modal)} content="Add Employee" />
+                <Button onClick={() => setModal(!modal)} id="employees-add-button" content="Add Employee" />
                 <Search
                     onSearchChange={_.debounce(handleSearch, 500, { leading: true, trailing: true })}
                     open={false}
@@ -245,7 +290,7 @@ export default function Employees() {
             </div>
             {/* Table */}
             {loading ? <Dimmer active inverted><Loader inverted>Loading</Loader></Dimmer> : 
-                <Table sortable celled unstackable singleLine selectable>
+                <Table sortable unstackable singleLine selectable>
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell>Photo</Table.HeaderCell>
@@ -266,7 +311,7 @@ export default function Employees() {
                     <Table.Body>
                         { data.length < 1 ? 
                             <EmptyResult /> 
-                            : data[page].map(employee => <EmployeeTable key={employee.id} employee={employee} />)
+                            : data[page].map((employee, index) => <EmployeeTable key={employee.id} employee={employee} authOptions={authOptions} index={index} superiorOptions={superiorOptions} />)
                         }
                     </Table.Body>
                 </Table>

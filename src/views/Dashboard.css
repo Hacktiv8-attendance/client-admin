@@ -51,11 +51,32 @@
     justify-content: center;
 }
 
-#dashboard-broadcast-counter{
+.dashboard-broadcast-counter{
     display: block;
     text-align: end;
 }
 
 .field{
     margin-bottom: 0 !important;
+}
+
+#dashboard-greeting {
+    margin: 0;
+    margin-bottom: 15px;
+}
+
+#dashboard-date {
+    margin: 0;
+}
+
+#dashboard-time {
+    margin: 0;
+}
+
+#dashboard-container{
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }

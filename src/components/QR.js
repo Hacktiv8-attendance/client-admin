@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import QRcode from 'qrcode.react'
 import axios from 'axios'
 import { Button, Image, Container } from 'semantic-ui-react'
@@ -19,11 +19,13 @@ export default function QR() {
         else return 'evening'
     }
 
-
-    setInterval(() => {
-        setClock(moment(new Date()).format("dddd, MMMM Do YYYY, HH:mm:ss"))
-    }, 1000)
-
+    
+    useEffect(() => {
+        setInterval(() => {
+            setClock(moment().format("dddd, MMMM Do YYYY, HH:mm:ss"))
+        }, 1000)
+    }, [])
+ 
     const getQRcode = (event) => {
         setDisabled(true)
         event.preventDefault()
@@ -51,7 +53,7 @@ export default function QR() {
     return (
         <div id="qr-page">
             <Container id="qr-container">
-                <h2 id="qr-greeting">Good {greetings(Number(clock.substr(-8, 2)))}, have a nice day! </h2>
+                <h2 style={{ backgroundColor: "#e4f9f5" }} id="qr-greeting">Good {greetings(Number(clock.substr(-8, 2)))}, have a nice day! </h2>
                 <h2 id="qr-date">{clock.substr(0, (clock.length - 10))}</h2>
                 <h1 id="qr-time">{clock.substr(-8, 8)}</h1>
                 { QR ? <QRcode value={QR} size={300} /> : <Image src={HSQLogo} size="medium" /> }

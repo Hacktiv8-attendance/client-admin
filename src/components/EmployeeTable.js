@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { Table, Image, Modal, Form, Button, Icon } from 'semantic-ui-react'
 import moment from 'moment'
-import ImageDefault from '../assets/ImageDefault.png'
 import Axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateEmployee, deleteEmployee, fetchEmployees } from '../store/actions'
+import { updateEmployee, deleteEmployee, fetchEmployees, setError } from '../store/actions'
 
-export default function EmployeeTable({ employee }) {
+import ImageDefault from '../assets/ImageDefault.png'
+import '../views/Employees.css'
+
+export default function EmployeeTable({ index, employee, authOptions, superiorOptions }) {
     const dispatch = useDispatch()
     const loading = useSelector(state => state.reducers.loading)
     const dbPassword = employee.password
@@ -18,34 +20,39 @@ export default function EmployeeTable({ employee }) {
     ]
 
     // Edit Form
-    const [name, setName] = useState(employee.name)
-    const [email, setEmail] = useState(employee.email)
-    const [password, setPassword] = useState(employee.password)
-    const [birthDate, setBirthDate] = useState(employee.birthDate.substr(0, 10))
-    const [address, setAddress] = useState(employee.address)
-    const [phoneNumber, setPhoneNumber] = useState(employee.phoneNumber)
-    const [role, setRole] = useState(employee.role)
-    const [superior, setSuperior] = useState(employee.SuperiorId)
-    const [authLevel, setAuthLevel] = useState(employee.authLevel)
     const [photo, setPhoto] = useState(employee.image_url)
-    const [paidLeave, setPaidLeave] = useState(employee.paidLeave)
+    const [formContent, setFormContent] = useState({
+        id: employee.id,
+        name: employee.name,
+        email: employee.email,
+        password: employee.password,
+        birthDate: moment(employee.birthDate).format('YYYY-MM-DD'),
+        address: employee.address,
+        phoneNumber: employee.phoneNumber,
+        role: employee.role,
+        SuperiorId: employee.SuperiorId,
+        authLevel: employee.authLevel,
+        paidLeave: employee.paidLeave,
+    })
 
     // Other state
     const [modal, setModal] = useState(false)
-    const [error, setError] = useState('')
-
+    const [deleteModal, setDeleteModal] = useState(false)
+    const error = useSelector(state => state.reducers.error)
     const resetForm = () => {
-        setName(employee.name)
-        setEmail(employee.email)
-        setPassword(employee.password)
-        setBirthDate(employee.birthDate.substr(0, 10))
-        setAddress(employee.add)
-        setPhoneNumber(employee.phoneNumber)
-        setRole(employee.role)
-        setSuperior(employee.SuperiorId)
-        setAuthLevel(employee.authLevel)
-        setPhoto(employee.image_url)
-        setPaidLeave(employee.paidLeave)
+        setFormContent({
+            id: employee.id,
+            name: employee.name,
+            email: employee.email,
+            password: employee.password,
+            birthDate: moment(employee.birthDate).format('YYYY-MM-DD'),
+            address: employee.address,
+            phoneNumber: employee.phoneNumber,
+            role: employee.role,
+            superiorId: employee.superiorId,
+            authLevel: employee.authLevel,
+            paidLeave: employee.paidLeave,
+        })
     }
 
     const handleImage = (event) => {
@@ -66,65 +73,57 @@ export default function EmployeeTable({ employee }) {
     }
 
     const handleSubmitForm = (event) => {
-        setError('')
+        dispatch(setError(null))
         event.preventDefault()
         
         // Guard
-        if(!name) return setError('Please input employees Full Name')
-        if(!email) return setError('Please input employees email')
-        if(!password) return setError('Please input employees password')
-        if(!birthDate) return setError('Please input employees birth date')
-        if(!address) return setError('Please input employees address')
-        if(!phoneNumber) return setError('Please input employees phone number')
-        if(!role) return setError('Please input employees role')
-        if(!superior) return setError('Please input employees superior')
-        if(!authLevel) return setError('Please input employees authority level')
-        if(password === dbPassword) {
+        if(!formContent.name) return dispatch(setError('Please input employees Full Name'))
+        if(!formContent.email) return dispatch(setError('Please input employees email'))
+        if(!formContent.password) return dispatch(setError('Please input employees password'))
+        if(!formContent.birthDate) return dispatch(setError('Please input employees birth date'))
+        if(!formContent.address) return dispatch(setError('Please input employees address'))
+        if(!formContent.phoneNumber) return dispatch(setError('Please input employees phone number'))
+        if(!formContent.role) return dispatch(setError('Please input employees role'))
+        if(!formContent.SuperiorId) return dispatch(setError('Please input employees superior'))
+        if(!formContent.authLevel) return dispatch(setError('Please input employees authority level'))
+
+        if(formContent.password === dbPassword) {
             dispatch(updateEmployee({
-                id: employee.id, name, email, birthDate, address, phoneNumber, role, SuperiorId: superior, image_url: photo, paidLeave, authLevel
+                ...formContent, image_url: photo,
             }))
         } else {
-            dispatch(updateEmployee({
-                id: employee.id, name, email, password , birthDate, address, phoneNumber, role, SuperiorId: superior, image_url: photo, paidLeave, authLevel
-            }))
             dispatch(fetchEmployees())
         }
-         
 
         setModal(!modal)
     }
 
-
-
-    const getFormatDate = (date) => {
-        return setBirthDate(date.substr(0, 10))
-    }
-    
-    const deleteHandle = () => {
-        dispatch(deleteEmployee(employee.id))
+    const handleChange = (event) => {
+        const { name, value } = event.target
+        setFormContent({ ...formContent, [name]: value })
     }
 
     return (
-        <Table.Row textAlign='center'>
-            <Table.Cell> <Image alt={employee.name} src={employee.image_url ? employee.image_url: ImageDefault } size="tiny"/> </Table.Cell>
+        <Table.Row className={ index % 2 === 0 ? 'employee-table-even' : 'employee-table-odd' } textAlign='center'>
+            <Table.Cell> <Image alt={employee.name} src={employee.image_url ? employee.image_url: ImageDefault} size="tiny"/> </Table.Cell>
             <Table.Cell> {employee.id} </Table.Cell>
             <Table.Cell> {employee.name} </Table.Cell>
             <Table.Cell> {employee.email} </Table.Cell>
             <Table.Cell> {employee.role} </Table.Cell>
-            <Table.Cell> {employee.SuperiorId   } </Table.Cell>
+            <Table.Cell> {employee.SuperiorId} </Table.Cell>
             <Table.Cell> {employee.authLevel} </Table.Cell>
-            <Table.Cell> { moment(employee.birthDate).format('L') } </Table.Cell>
+            <Table.Cell> {moment(employee.birthDate).format('L')} </Table.Cell>
             <Table.Cell> {employee.address} </Table.Cell>
             <Table.Cell> {employee.phoneNumber} </Table.Cell>
             <Table.Cell> {employee.paidLeave} </Table.Cell>
             <Table.Cell>
-                <Button animated="vertical" onClick={() => setModal(!modal)} primary>
+                <Button style={{ backgroundColor: "#11999e", color: "white" }} animated="vertical" onClick={() => setModal(!modal)}>
                     <Button.Content visible>Edit</Button.Content>
                     <Button.Content hidden>
                         <Icon name='edit' />
                     </Button.Content>
                 </Button>
-                <Button animated="vertical" onClick={deleteHandle} color="red">
+                <Button style={{ backgroundColor: "#40514e", color: 'white' }} animated="vertical" onClick={() => setDeleteModal(!deleteModal)}>
                     <Button.Content visible>Delete</Button.Content>
                     <Button.Content hidden>
                         <Icon name='trash' />
@@ -135,80 +134,116 @@ export default function EmployeeTable({ employee }) {
                 <Form loading={loading} id="employees-add-form">
                     { error && <h6 id="employees-add-error"> { error } </h6> }
                     <Form.Input 
+                        className="employee-add-form-input"
                         label="Full name" 
                         placeholder='Full Name'
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
+                        name="name"
+                        value={formContent.name}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         label="Email" 
+                        name="email"
                         placeholder='Email'
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
+                        value={formContent.email}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         type="password"
+                        name="password"
                         label="Password" 
                         placeholder='Password'
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
+                        value={formContent.password}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         type="date"
+                        name="birthDate"
                         label="Birth Date" 
                         placeholder='Birth Date'
-                        value={birthDate}
-                        onChange={(event) => getFormatDate(event.target.value)}
+                        value={formContent.birthDate}
+                        onChange={handleChange}
                     />
                     <Form.TextArea 
+                        className="employee-add-form-input"
                         label="Address" 
                         placeholder='Address'
-                        value={address}
-                        onChange={(event) => setAddress(event.target.value)}
+                        name="address"
+                        value={formContent.address}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         label="PhoneNumber" 
                         placeholder='PhoneNumber'
-                        value={phoneNumber}
-                        onChange={(event) => setPhoneNumber(event.target.value)}
+                        name="phoneNumber"
+                        value={formContent.phoneNumber}
+                        onChange={handleChange}
                     />
                     <Form.Select 
-                        label="Role" 
-                        options={roleOptions}
+                        className="employee-add-form-input"
+                        label="Role"
                         placeholder="Role"
-                        onChange={(event, { value }) => setRole(value)}
+                        name="role"
+                        value={formContent.role}
+                        options={roleOptions}
+                        onChange={(event, target) => handleChange({ target })}
                     />
-                    <Form.Input 
-                        label="Superior ID" 
-                        placeholder='Superior ID'
-                        value={superior}
-                        onChange={(event) => setSuperior(event.target.value)}
+                    <Form.Select
+                        className="employee-add-form-input"
+                        label="Superior ID"
+                        placeholder="Superior ID"
+                        search
+                        searchInput={{ id: "superiorId" }}
+                        name="SuperiorId"
+                        value={formContent.SuperiorId}
+                        options={superiorOptions}
+                        onChange={(event, target) => handleChange({ target })}
                     />
-                    <Form.Input 
+                    <Form.Select 
+                        className="employee-add-form-input"
                         label="Authority Level" 
-                        placeholder='Authority Level'
-                        value={authLevel}
-                        onChange={(event) => setAuthLevel(event.target.value)}
+                        placeholder="Authority Level"
+                        options={authOptions}
+                        name="authLevel"
+                        value={formContent.authLevel}
+                        onChange={(event, target) => handleChange({ target })}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         label="Annual Leave" 
                         placeholder='Annual Leave'
-                        value={paidLeave}
-                        onChange={(event) => setPaidLeave(event.target.value)}
+                        name="paidLeave"
+                        value={formContent.paidLeave}
+                        onChange={handleChange}
                     />
                     <Form.Input 
+                        className="employee-add-form-input"
                         type="file"
+                        label="Employee Photo"
                         onChange={(event) => handleImage(event)}
                     />
                     <div className="employee-edit-container">
                         <Image id="employee-edit-photo" size="medium" src={photo} />
                         <Button.Group className="employee-edit-buttons" widths={2}>
-                            <Button primary onClick={(event) => handleSubmitForm(event)} content="Submit" />
-                            <Button color={'red'} onClick={() => { setModal(!modal) ; resetForm()}} content="Cancel" />
+                            <Button style={{ backgroundColor: "#11999e", color: "white" }} onClick={(event) => handleSubmitForm(event)} content="Submit" />
+                            <Button.Or />
+                            <Button style={{ backgroundColor: "#40514e", color: "white" }} onClick={() => { setModal(!modal) ; resetForm()}} content="Cancel" />
                         </Button.Group>
                     </div>
-
                 </Form>
+            </Modal>
+            
+            <Modal closeIcon onClose={() => setDeleteModal(!deleteModal)} open={deleteModal}>
+                <Modal.Header>
+                    Are you sure want to delete {employee.name} ?
+                </Modal.Header>
+                <Modal.Actions>
+                    <Button onClick={() => { setDeleteModal(!deleteModal); dispatch(deleteEmployee(employee.id)) }} content="Confirm" />
+                </Modal.Actions>
             </Modal>
         </Table.Row>
     )

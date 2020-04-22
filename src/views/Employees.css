@@ -1,12 +1,9 @@
-#employees-page{
-    /* background-color: whitesmoke; */
-}
 
-#employees-add-form{
+#employees-add-form {
     padding: 25px;
 }
 
-#employees-add-error{
+#employees-add-error {
     color: red;
     font-weight: bold;
     text-align: center;
@@ -15,32 +12,32 @@
     font-size: small;
 }
 
-.employee-photo{
+.employee-photo {
     object-fit: cover;
 }
 
-.employee-edit-container{
+.employee-edit-container {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
 
-.employee-edit-buttons{
+.employee-edit-buttons {
     margin-top: 1rem;
 }
 
-#employee-edit-photo{
+#employee-edit-photo {
     margin-bottom: 15px;
     border: 4px #30e3ca solid;
 }
 
-.employees-nav-container{
+.employees-nav-container {
     display: flex;
     justify-content: space-between;
 }
 
-.employees-empty-container{
+.employees-empty-container {
     margin-top: 15px;
     display: flex;
     flex-direction: column;
@@ -48,8 +45,33 @@
     align-items: center;
 }
 
-.employees-pagination{
+.employees-pagination {
     display: flex;
     justify-content: center;
     margin-bottom: 15px;
+}
+
+.employee-add-form-input {
+    padding-bottom: 15px;
+}
+
+.employee-table-even {
+    background-color: #e4f9f5;
+    font-weight: bolder;
+}
+
+.employee-table-odd {
+    background-color: rgba(48,227,202, 0.5);
+    font-weight: bolder;
+}
+
+.employees-page {
+    overflow: scroll;
+    width: 100vw;
+}
+
+#employees-add-button {
+    background-color: #11999e;
+    color: white;
+    font-weight: bold;
 }

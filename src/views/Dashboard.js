@@ -4,8 +4,11 @@ import DashboardBroadcast from '../components/DashboardBroadcast'
 import { useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchAbsence, fetchEmployees } from '../store/actions'
-import { Form, Container, Accordion } from 'semantic-ui-react'
+import { Form, Container, Accordion, Image } from 'semantic-ui-react'
 import CanvasJSReact from '../canvasjs.react';
+import moment from 'moment'
+import _ from 'lodash'
+import HRDashboard from '../assets/hr_dashboard.svg'
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -34,7 +37,14 @@ export default function Dashboard() {
     const [month, setMonth] = useState("2020-03")
     const [SuperiorId, setSuperiorId] = useState(2)
     const [option, setOption] = useState([])
-    const [activeAccordion, setActiveAccordion] = useState(1)
+    const [activeAccordion, setActiveAccordion] = useState(3)
+
+    const [clock, setClock] = useState('')
+    const greetings = (hour) => {
+        if(hour >= 4 && hour < 12) return 'morning'
+        if(hour >= 12 && hour <= 18) return 'afternoon'
+        else return 'evening'
+    }
 
     const options = {
         animationEnabled: true,
@@ -59,8 +69,15 @@ export default function Dashboard() {
     
     const handleClick = (event) => {
         event.preventDefault()
-        dispatch(fetchAbsence({month, SuperiorId}))
+        dispatch(fetchAbsence({ month, SuperiorId }))
     }
+
+    const getName = () => _.chain(localStorage.getItem('email'))
+                            .split('@')
+                            .head()
+                            .replace('.', ' ')
+                            .startCase()
+                            .value()
 
     useEffect(() => {
         if(localStorage.getItem('qr')) {
@@ -85,10 +102,27 @@ export default function Dashboard() {
             })
             setOption(manager)
         }
+        setInterval(() => {
+            setClock(moment().format("dddd, MMMM Do YYYY, HH:mm:ss"))
+        }, 1000)
     }, [history, absence.length, month, employees.length, dispatch, SuperiorId, employees])
+
     return (
         <div id="dashboard-page">
             <Accordion exclusive={false} fluid styled>
+                <Accordion.Title 
+                    active={activeAccordion === 3}
+                    content="Dashboard"
+                    onClick={() => activeAccordion === 3 ? setActiveAccordion(-3) : setActiveAccordion(3) }
+                /> 
+                <Accordion.Content active={activeAccordion === 3}>
+                    <Container id="dashboard-container">
+                        <h2 style={{ backgroundColor: "#e4f9f5" }} id="dashboard-greeting">Good {greetings(Number(clock.substr(-8, 2)))} {getName()}, have a nice day! </h2>
+                        <Image src={HRDashboard} />
+                        <h2 style={{ backgroundColor: "#30e3ca" }} id="dashboard-date">{clock.substr(0, (clock.length - 10))}</h2>
+                        <h1 style={{ backgroundColor: "#e4f9f5", fontSize: "4em" }} id="dashboard-time">{clock.substr(-8, 8)}</h1>
+                    </Container>
+                </Accordion.Content>
                 <Accordion.Title
                     active={activeAccordion === 1}
                     content="Monthly Chart"
@@ -96,7 +130,7 @@ export default function Dashboard() {
                 />
                 <Accordion.Content active={activeAccordion === 1}>
                     <div id="dashboard-chart">
-                        <h1>Monthly Attendance Report</h1>
+                        <h1 style={{ backgroundColor: "#e4f9f5" }}>Monthly Attendance Report</h1>
                         <Form loading={loading} className="dashboard-chart-form">
                             <Form.Group widths='equal'>
                                 <Form.Select 
@@ -110,6 +144,7 @@ export default function Dashboard() {
                                     onChange={(event, { value }) => setSuperiorId(value)}
                                 />
                                 <Form.Button 
+                                    style={{ backgroundColor : "#30e3ca", color: "white" }}
                                     onClick={(event) => handleClick(event)} 
                                     content="Submit" 
                                 />                            
@@ -122,7 +157,7 @@ export default function Dashboard() {
                 <Accordion.Title
                     active={activeAccordion === 2}
                     content="Broadcast Message"
-                    onClick={(event) => activeAccordion === 2 ? setActiveAccordion(-2) : setActiveAccordion(2) }
+                    onClick={() => activeAccordion === 2 ? setActiveAccordion(-2) : setActiveAccordion(2) }
                 />
                 <Accordion.Content active={activeAccordion === 2}>
                     <Container>

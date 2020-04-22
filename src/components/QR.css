@@ -23,6 +23,6 @@
 }
 
 #qr-button{
-    background-color: #11999e;
+    background-color: #11999e !important;
     color: white;
 }
